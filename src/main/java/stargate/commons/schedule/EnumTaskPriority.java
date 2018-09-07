@@ -15,17 +15,26 @@
 */
 package stargate.commons.schedule;
 
-import java.util.Collection;
-import stargate.commons.cluster.Node;
-
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractScheduledTask implements Runnable {
-    public abstract String getName();
-    public abstract Collection<Node> getNodes();
-    public abstract boolean isRepeatedTask();
-    public abstract long getDelay();
-    public abstract long getInterval();
+public enum EnumTaskPriority {
+    TASK_PRIORITY_HIGH(10),
+    TASK_PRIORITY_MID(5),
+    TASK_PRIORITY_LOW(1);
+    
+    private int numPriority;
+    
+    EnumTaskPriority(int num) {
+        this.numPriority = num;
+    }
+    
+    public int getPriorityNum() {
+        return this.numPriority;
+    }
+    
+    public static int getPriorityNum(EnumTaskPriority priority) {
+        return priority.numPriority;
+    }
 }

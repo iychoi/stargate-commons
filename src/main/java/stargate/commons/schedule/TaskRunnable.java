@@ -15,13 +15,19 @@
 */
 package stargate.commons.schedule;
 
-import java.io.IOException;
-import stargate.commons.driver.AbstractDriver;
-
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractScheduleDriver extends AbstractDriver {
-    public abstract void scheduleTask(Task task) throws IOException;
+public abstract class TaskRunnable implements Runnable {
+
+    protected Object param;
+    
+    public void setParameter(Object param) {
+        this.param = param;
+    }
+    
+    public Object getParameter() {
+        return this.param;
+    }
 }

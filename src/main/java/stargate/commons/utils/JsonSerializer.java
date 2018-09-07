@@ -60,4 +60,13 @@ public class JsonSerializer {
     public Object fromJsonFile(File f, Class<?> cls) throws IOException {
         return this.mapper.readValue(f, cls);
     }
+    
+    public String formatPretty(String json) throws IOException {
+        if(json == null) {
+            return null;
+        }
+        StringReader reader = new StringReader(json);
+        Object obj = this.mapper.readValue(reader, Object.class);
+        return this.mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+    }
 }

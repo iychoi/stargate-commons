@@ -26,5 +26,6 @@ public abstract class AbstractClusterDriver extends AbstractDriver {
     
     public abstract Node getLocalNode() throws IOException;
     public abstract Cluster getLocalCluster() throws IOException;
-    public abstract String getLeaderNodeName();
+    public abstract String getLeaderNodeName() throws IOException;
+    public abstract boolean isLeaderNode() throws IOException;
 }
