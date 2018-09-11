@@ -32,8 +32,8 @@ public class TaskSchedule extends Task {
     private static final Log LOG = LogFactory.getLog(TaskSchedule.class);
     
     protected boolean repeat;
-    protected long delay;
-    protected long interval;
+    protected long delay; // in sec
+    protected long interval; // in sec
     
     public static TaskSchedule createInstance(File file) throws IOException {
         if(file == null) {

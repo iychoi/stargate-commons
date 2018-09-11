@@ -272,18 +272,11 @@ public class Task {
     }
     
     @JsonIgnore
-    public Runnable getRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Runnable taskInstance = (Runnable) ClassUtils.getClassInstance(taskClass);
-                    taskInstance.run();
-                } catch (Exception ex) {
-                    LOG.error(ex);
-                }
-            }
-        };
+    public TaskRunnable getRunnable() throws Exception {
+        TaskRunnable taskInstance = null;
+        taskInstance = (TaskRunnable) ClassUtils.getClassInstance(taskClass);
+        taskInstance.setParameter(this.value);
+        return taskInstance;
     }
     
     @Override

@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
@@ -78,11 +79,11 @@ public class RestfulClient {
             this.httpClient.addFilter(new HTTPBasicAuthFilter(username, password));
         }
         
-        LOG.info("RestfulClient for " + this.serviceURL.toString() + " is created");
+        LOG.debug("RestfulClient for " + this.serviceURL.toString() + " is created");
     }
     
     public void close() {
-        LOG.info("Destroying RestfulClient for " + this.serviceURL.toString());
+        LOG.debug("Destroying RestfulClient for " + this.serviceURL.toString());
         
         //this.httpClient.getExecutorService().shutdownNow();
         if(this.httpClient != null) {
@@ -95,17 +96,26 @@ public class RestfulClient {
             this.connectionManager = null;
         }
         
-        LOG.info("RestfulClient for " + this.serviceURL.toString() + " is destroyed");
+        LOG.debug("RestfulClient for " + this.serviceURL.toString() + " is destroyed");
     }
     
     private URI makeRequestURL(String path) {
-        URI requestURL;
-        if(path.startsWith("/")) {
-            requestURL = this.serviceURL.resolve(path.substring(1));
-        } else {
-            requestURL = this.serviceURL.resolve(path);
+        String urlString = this.serviceURL.toASCIIString();
+        if(!urlString.endsWith("/")) {
+            urlString = urlString + "/";
         }
         
+        URI requestURL;
+        try {
+            if(path.startsWith("/")) {
+                requestURL = new URI(urlString + path.substring(1));
+            } else {
+                requestURL = new URI(urlString + path);
+            }
+        } catch (URISyntaxException ex) {
+            LOG.error(ex);
+            requestURL = this.serviceURL.resolve(path);
+        }
         return requestURL;
     }
     
@@ -125,12 +135,77 @@ public class RestfulClient {
         //}
         
         URI requestURL = makeRequestURL(path);
-        LOG.info("sending a post request - " + requestURL.toString());
+        LOG.debug("sending a post request - " + requestURL.toString());
         AsyncWebResource webResource = this.httpClient.asyncResource(requestURL);
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").post(ClientResponse.class, request);
     }
     
     public Object processPost(Future<ClientResponse> future, GenericType<?> responseType) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+        if(future == null) {
+            throw new IllegalArgumentException("future is null");
+        }
+        
+        //if(responseType == null) {
+        //    throw new IllegalArgumentException("responseType is null");
+        //}
+        
+        // wait for completion
+        try {
+            ClientResponse response = future.get();
+            if(response.getStatus() >= 200 && response.getStatus() <= 299) {
+                if(responseType == null) {
+                    response.close();
+                    return true;
+                } else {
+                    Object entity = response.getEntity(responseType);
+                    response.close();
+                    return entity;
+                }
+            } else if(response.getStatus() == 401 || response.getStatus() == 403) {
+                response.close();
+                throw new AuthenticationException();
+            } else if(response.getStatus() == 404) {
+                String message = response.toString();
+                response.close();
+                throw new FileNotFoundException(message);
+            } else {
+                RestfulError err = response.getEntity(new GenericType<RestfulError>(){});
+                err.setHttpErrno(response.getStatus());
+                if(response.getLocation() != null) {
+                    err.setPath(response.getLocation().toString());
+                }
+                response.close();
+                throw err.makeException();
+            }
+        } catch (InterruptedException ex) {
+            throw new IOException(ex);
+        } catch (ExecutionException ex) {
+            throw new IOException(ex);
+        }
+    }
+    
+    public Object put(String path, Object request, GenericType<?> responseType) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+        Future<ClientResponse> future = putAsync(path, request);
+        return processPut(future, responseType);
+    }
+    
+    public Future<ClientResponse> putAsync(String path, Object request) throws IOException {
+        if(path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("path is null or empty");
+        }
+        
+        // request can be null
+        //if(request == null) {
+        //    throw new IllegalArgumentException("request is null");
+        //}
+        
+        URI requestURL = makeRequestURL(path);
+        LOG.debug("sending a put request - " + requestURL.toString());
+        AsyncWebResource webResource = this.httpClient.asyncResource(requestURL);
+        return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").put(ClientResponse.class, request);
+    }
+    
+    public Object processPut(Future<ClientResponse> future, GenericType<?> responseType) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
@@ -185,7 +260,7 @@ public class RestfulClient {
         }
         
         URI requestURL = makeRequestURL(path);
-        LOG.info("sending a get request - " + requestURL.toString());
+        LOG.debug("sending a get request - " + requestURL.toString());
         AsyncWebResource webResource = this.httpClient.asyncResource(requestURL);
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").get(ClientResponse.class);
     }
@@ -240,7 +315,7 @@ public class RestfulClient {
         }
         
         URI requestURL = makeRequestURL(path);
-        LOG.info("sending a delete request - " + requestURL.toString());
+        LOG.debug("sending a delete request - " + requestURL.toString());
         AsyncWebResource webResource = this.httpClient.asyncResource(requestURL);
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").delete(ClientResponse.class);
     }
@@ -300,7 +375,7 @@ public class RestfulClient {
         }
         
         URI requestURL = makeRequestURL(path);
-        LOG.info("sending a download request - " + requestURL.toString());
+        LOG.debug("sending a download request - " + requestURL.toString());
         AsyncWebResource webResource = this.httpClient.asyncResource(requestURL);
         return (Future<ClientResponse>) webResource.accept("application/octet-stream").type("application/json").get(ClientResponse.class);
     }

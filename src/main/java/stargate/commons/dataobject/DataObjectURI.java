@@ -202,10 +202,6 @@ public class DataObjectURI implements Comparable {
     
     private URI createURI(String authority, String path) {
         try {
-            if(authority == null || authority.isEmpty()) {
-                return new URI(STARGATE_SCHEME + ":///");
-            }
-            
             URI uri = new URI(STARGATE_SCHEME, authority, normalizePath(path), null, null);
             return uri.normalize();
         } catch (URISyntaxException e) {

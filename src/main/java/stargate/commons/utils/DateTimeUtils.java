@@ -18,6 +18,7 @@ package stargate.commons.utils;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -44,5 +45,10 @@ public class DateTimeUtils {
     
     public static LocalDateTime getDateTime(long timestamp) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), GMT_ZONEID);
+    }
+    
+    public static String getDateTimeString(long timestamp) {
+        LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), GMT_ZONEID);
+        return time.format(DateTimeFormatter.ISO_DATE_TIME);
     }
 }

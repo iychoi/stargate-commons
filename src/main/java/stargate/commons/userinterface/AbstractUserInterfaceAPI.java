@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import stargate.commons.cluster.Cluster;
+import stargate.commons.config.AbstractImmutableConfig;
 import stargate.commons.dataobject.DataObjectMetadata;
 import stargate.commons.dataobject.DataObjectURI;
 import stargate.commons.datasource.DataExportEntry;
@@ -30,15 +31,32 @@ import stargate.commons.recipe.Recipe;
  */
 public abstract class AbstractUserInterfaceAPI {
     public abstract boolean isLive() throws IOException;
+    public abstract AbstractImmutableConfig getServiceConfig() throws IOException;
     
     public abstract Cluster getCluster() throws IOException;
+    
+    public abstract Collection<String> listRemoteClusters() throws IOException;
+    public abstract Collection<Cluster> getRemoteClusters() throws IOException;
     public abstract Cluster getRemoteCluster(String name) throws IOException;
+    public abstract void addRemoteCluster(Cluster cluster) throws IOException;
+    public abstract void removeRemoteCluster(String name) throws IOException;
 
+    public abstract Collection<String> listDataExportEntries() throws IOException;
+    public abstract Collection<DataExportEntry> getDataExportEntries() throws IOException;
+    public abstract DataExportEntry getDataExportEntry(DataObjectURI uri) throws IOException;
+    public abstract void addDataExportEntry(DataExportEntry entry) throws IOException;
+    public abstract void removeDataExportEntry(DataObjectURI uri) throws IOException;
+    
     public abstract DataObjectMetadata getDataObjectMetadata(DataObjectURI uri) throws IOException;
-    public abstract Collection<DataObjectMetadata> listDataObjectMetadata(DataObjectURI uri) throws IOException;
+    public abstract Collection<DataObjectMetadata> listDataObjectMetadatas(DataObjectURI uri) throws IOException;
+    
+    public abstract Collection<String> listRecipes() throws IOException;
     public abstract Recipe getRecipe(DataObjectURI uri) throws IOException;
+    public abstract void removeRecipe(DataObjectURI uri) throws IOException;
+    public abstract void syncRecipes() throws IOException;
+    
     public abstract InputStream getDataChunk(String hash) throws IOException;
     
     public abstract boolean schedulePrefetch(DataObjectURI uri, String hash) throws IOException;
-    public abstract DataExportEntry getDataExportEntry(DataObjectURI uri) throws IOException;
+    public abstract Collection<String> listDataSources() throws IOException;
 }
