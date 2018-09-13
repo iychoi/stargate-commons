@@ -48,12 +48,20 @@ public class DataObjectURI implements Comparable {
         
         if(!uri.startsWith(STARGATE_SCHEME + "://")) {
             if(uri.startsWith("/")) {
-                initialize(STARGATE_SCHEME + "://" + uri.substring(1));
+                if(uri.equals("/")) {
+                    initialize(STARGATE_SCHEME + ":///");
+                } else {
+                    initialize(STARGATE_SCHEME + "://" + uri.substring(1));
+                }
             } else {
                 initialize(STARGATE_SCHEME + "://" + uri);
             }
         } else {
-            initialize(uri);
+            if(uri.equals(STARGATE_SCHEME + "://")) {
+                initialize(STARGATE_SCHEME + ":///");
+            } else {
+                initialize(uri);
+            }
         }
     }
     
@@ -66,11 +74,19 @@ public class DataObjectURI implements Comparable {
             throw new IllegalArgumentException("child is null or empty");
         }
         
-        initialize(cluster, parent, child);
+        if(cluster == null || cluster.isEmpty()) {
+            initialize("", parent, child);
+        } else {
+            initialize(cluster, parent, child);
+        }
     }
     
     public DataObjectURI(String cluster, String uri) {
-        initialize(cluster, uri);
+        if(cluster == null || cluster.isEmpty()) {
+            initialize("", uri);
+        } else {
+            initialize(cluster, uri);
+        }
     }
     
     public DataObjectURI(URI uri) {
@@ -155,8 +171,8 @@ public class DataObjectURI implements Comparable {
         }
         
         String authority = uri.getAuthority();
-        if(authority == null || authority.isEmpty()) {
-            throw new IllegalArgumentException("authority of given uri is null or empty");
+        if(authority == null) {
+            authority = "";
         }
         
         this.uri = createURI(authority, uri.getPath());
@@ -202,8 +218,13 @@ public class DataObjectURI implements Comparable {
     
     private URI createURI(String authority, String path) {
         try {
-            URI uri = new URI(STARGATE_SCHEME, authority, normalizePath(path), null, null);
-            return uri.normalize();
+            if(authority == null || authority.equals("")) {
+                URI uri = new URI(STARGATE_SCHEME, "", normalizePath(path), null, null);
+                return uri.normalize();
+            } else {
+                URI uri = new URI(STARGATE_SCHEME, authority, normalizePath(path), null, null);
+                return uri.normalize();
+            }
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }

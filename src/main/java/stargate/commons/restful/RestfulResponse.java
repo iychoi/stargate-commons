@@ -15,25 +15,42 @@
 */
 package stargate.commons.restful;
 
+import java.io.IOException;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.ClassUtils;
+import stargate.commons.utils.JsonSerializer;
 
 /**
  *
  * @author iychoi
  */
-public class RestfulResponse<T> {
-    private T response;
+public class RestfulResponse {
+    private Class responseClass;
+    private String responseJson;
     private Class exceptionClass;
-    private RestfulException exception;
+    private Exception exception;
     
-    public RestfulResponse() {
-        
+    public RestfulResponse() {   
     }
     
-    public RestfulResponse(T response) {
-        this.response = response;
+    public RestfulResponse(Object response) throws IOException {
+        if(response != null) {
+            if(response.getClass() != String.class) {
+                this.responseClass = response.getClass();
+                JsonSerializer serializer = new JsonSerializer();
+                this.responseJson = serializer.toJson(response);
+            } else {
+                this.responseClass = response.getClass();
+                this.responseJson = (String) response;
+            }
+        } else {
+            this.responseClass = null;
+            this.responseJson = null;
+        }
+        
+        this.exception = null;
+        this.exceptionClass = null;
     }
     
     public RestfulResponse(Exception ex) {
@@ -41,28 +58,97 @@ public class RestfulResponse<T> {
             throw new IllegalArgumentException("ex is null");
         }
         
+        this.exception = ex;
         this.exceptionClass = ex.getClass();
-        this.exception = new RestfulException(ex);
+    }
+    
+    @JsonIgnore
+    public boolean hasResponse() {
+        return this.responseClass != null;
+    }
+    
+    @JsonIgnore
+    public boolean hasException() {
+        return this.exceptionClass != null;
+    }
+    
+    @JsonIgnore
+    public Class getResponseClass() {
+        return this.responseClass;
+    }
+    
+    @JsonProperty("response_class")
+    public String getResponseClassString() {
+        return this.responseClass.getCanonicalName();
+    }
+    
+    @JsonIgnore
+    public void setResponseClass(Class clazz) {
+        if(clazz == null) {
+            throw new IllegalArgumentException("clazz is null");
+        }
+        
+        this.responseClass = clazz;
+    }
+    
+    @JsonProperty("response_class")
+    public void setResponseClass(String clazz) throws ClassNotFoundException {
+        if(clazz == null || clazz.isEmpty()) {
+            throw new IllegalArgumentException("clazz is null or empty");
+        }
+        
+        this.responseClass = ClassUtils.findClass(clazz);
+    }
+    
+    @JsonIgnore
+    public void setResponse(Object response) throws IOException {
+        if(response == null) {
+            this.responseJson = null;
+        }
+        
+        if(response.getClass() != String.class) {
+            JsonSerializer serializer = new JsonSerializer();
+            this.responseJson = serializer.toJson(response);
+        } else {
+            this.responseJson = (String) response;
+        }
     }
     
     @JsonProperty("response")
-    public void setResponse(T response) {
-        this.response = response;
+    public void setResponseJson(String json) throws IOException {
+        this.responseJson = json;
+    }
+    
+    @JsonIgnore
+    public Object getResponse() throws IOException {
+        if(this.responseJson == null) {
+            return null;
+        }
+        
+        if(this.responseClass == String.class) {
+            return this.responseJson;
+        } else {
+            JsonSerializer serializer = new JsonSerializer();
+            return serializer.fromJson(this.responseJson, this.responseClass);
+        }
     }
     
     @JsonProperty("response")
-    public T getResponse() {
-        return this.response;
+    public String getResponseJson() throws IOException {
+        return this.responseJson;
+    }
+    
+    @JsonIgnore
+    public Class getExceptionClass() {
+        return this.exceptionClass;
     }
     
     @JsonProperty("exception_class")
-    public void setExceptionClass(String clazz) throws ClassNotFoundException {
-        if(clazz == null || clazz.isEmpty()) {
-            this.exceptionClass = null;
-            return;
+    public String getExceptionClassString() {
+        if(this.exceptionClass == null) {
+            return null;
         }
-        
-        this.exceptionClass = ClassUtils.findClass(clazz);
+        return this.exceptionClass.getCanonicalName();
     }
     
     @JsonIgnore
@@ -75,20 +161,17 @@ public class RestfulResponse<T> {
     }
     
     @JsonProperty("exception_class")
-    public String getExceptionClassString() {
-        if(this.exceptionClass == null) {
-            return null;
+    public void setExceptionClass(String clazz) throws ClassNotFoundException {
+        if(clazz == null || clazz.isEmpty()) {
+            this.exceptionClass = null;
+            return;
         }
-        return this.exceptionClass.getCanonicalName();
-    }
-    
-    @JsonIgnore
-    public Class getExceptionClass() {
-        return this.exceptionClass;
+        
+        this.exceptionClass = ClassUtils.findClass(clazz);
     }
     
     @JsonProperty("exception")
-    public void setException(RestfulException ex) {
+    public void setException(Exception ex) {
         this.exception = ex;
     }
     

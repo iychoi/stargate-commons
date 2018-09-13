@@ -48,7 +48,7 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract void removeDataExportEntry(DataObjectURI uri) throws IOException;
     
     public abstract DataObjectMetadata getDataObjectMetadata(DataObjectURI uri) throws IOException;
-    public abstract Collection<DataObjectMetadata> listDataObjectMetadatas(DataObjectURI uri) throws IOException;
+    public abstract Collection<DataObjectMetadata> listDataObjectMetadata(DataObjectURI uri) throws IOException;
     
     public abstract Collection<String> listRecipes() throws IOException;
     public abstract Recipe getRecipe(DataObjectURI uri) throws IOException;

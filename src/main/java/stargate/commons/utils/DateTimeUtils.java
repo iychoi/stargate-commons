@@ -26,7 +26,9 @@ import java.time.format.DateTimeFormatter;
  */
 public class DateTimeUtils {
     
-    public static ZoneId GMT_ZONEID = ZoneId.of("GMT");
+    //public static ZoneId GMT_ZONEID = ZoneId.of("GMT");
+    public static ZoneId LOCAL_ZONEID = ZoneId.systemDefault();
+    public static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     public static long getTimestamp() {
         return Instant.now().toEpochMilli();
@@ -44,11 +46,11 @@ public class DateTimeUtils {
     }
     
     public static LocalDateTime getDateTime(long timestamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), GMT_ZONEID);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), LOCAL_ZONEID);
     }
     
     public static String getDateTimeString(long timestamp) {
-        LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), GMT_ZONEID);
-        return time.format(DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), LOCAL_ZONEID);
+        return time.format(FORMATTER);
     }
 }

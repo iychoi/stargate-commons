@@ -15,11 +15,13 @@
 */
 package stargate.commons.restful;
 
+import java.io.IOException;
+
 /**
  *
  * @author iychoi
  */
-public class AuthenticationException extends Exception {
+public class AuthenticationException extends IOException {
 
     public AuthenticationException() {
         super("Could not authenticate");

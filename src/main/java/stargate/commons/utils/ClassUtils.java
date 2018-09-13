@@ -33,11 +33,33 @@ public class ClassUtils {
             throw new IllegalArgumentException("className is not given");
         }
         
+        if("int[]".equals(className)) {
+            int[] ret = new int[0];
+            return ret.getClass();
+        } else if("long[]".equals(className)) {
+            long[] ret = new long[0];
+            return ret.getClass();
+        } else if("double[]".equals(className)) {
+            double[] ret = new double[0];
+            return ret.getClass();
+        } else if("float[]".equals(className)) {
+            float[] ret = new float[0];
+            return ret.getClass();
+        }
+        
+        boolean array = false;
+        String classNameRefined = className;
+        if(className.endsWith("[]")) {
+            // array
+            array = true;
+            classNameRefined = className.substring(0, className.length()-2);
+        }
+        
         Class clazz = null;
         
         // check whether the given className is full package path
         try {
-            clazz = Class.forName(className);
+            clazz = Class.forName(classNameRefined);
         } catch(ClassNotFoundException ex) {
         }
 
@@ -45,7 +67,7 @@ public class ClassUtils {
         if(clazz == null) {
             if(lookupPaths != null) {
                 for(String pkg : lookupPaths) {
-                    String newClassName = pkg + "." + className;
+                    String newClassName = pkg + "." + classNameRefined;
                     try {
                         clazz = Class.forName(newClassName);
                     } catch(ClassNotFoundException ex) {
@@ -60,6 +82,12 @@ public class ClassUtils {
 
         if(clazz == null) {
             throw new ClassNotFoundException("Class was not found : " + className);
+        }
+        
+        if(array) {
+            // call if it is array and canonical name
+            String newClassName = String.format("[L%s;", clazz.getName());
+            return findClass(newClassName, null);
         }
         
         return clazz;

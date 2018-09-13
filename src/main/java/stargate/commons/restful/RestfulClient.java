@@ -119,9 +119,78 @@ public class RestfulClient {
         return requestURL;
     }
     
-    public Object post(String path, Object request, GenericType<?> responseType) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    private Object processResponse(ClientResponse response) throws IOException, FileNotFoundException, AuthenticationException {
+        if(response == null) {
+            throw new IllegalArgumentException("response is null");
+        }
+        
+        int status = response.getStatus();
+        RestfulResponse restfulResponse = response.getEntity(new GenericType<RestfulResponse>(){});
+        if(restfulResponse == null) {
+            response.close();
+            throw new IOException("Cannot read restful response");
+        }
+
+        response.close();
+        
+        if(status >= 200 && status <= 299) {
+            if(restfulResponse.hasResponse()) {
+                return restfulResponse.getResponse();
+            } else if(restfulResponse.hasException()) {
+                throw new IOException(restfulResponse.getException());
+            } else {
+                return true;
+            }
+        } else if(status == 401 || status == 403) {
+            if(restfulResponse.hasResponse()) {
+                return restfulResponse.getResponse();
+            } else if(restfulResponse.hasException()) {
+                throw new AuthenticationException(restfulResponse.getException());
+            } else {
+                throw new AuthenticationException(String.format("Authentication error - %d", status));
+            }
+        } else if(status == 404) {
+            if(restfulResponse.hasException()) {
+                throw new FileNotFoundException(restfulResponse.getException().getMessage());
+            } else {
+                throw new FileNotFoundException(String.format("File not found - %d", status));
+            }
+        } else {
+            if(restfulResponse.hasException()) {
+                throw new IOException(restfulResponse.getException());
+            } else {
+                throw new IOException(String.format("Unknown Exception - %d", status));
+            }
+        }
+    }
+    
+    private InputStream processResponseDownload(ClientResponse response) throws IOException, FileNotFoundException, AuthenticationException {
+        if(response == null) {
+            throw new IllegalArgumentException("response is null");
+        }
+        
+        int status = response.getStatus();
+        
+        if(status >= 200 && status <= 299) {
+            InputStream entityInputStream = response.getEntityInputStream();
+            // do not close            
+            //response.close();
+            return entityInputStream;
+        } else if(status == 401 || status == 403) {
+            response.close();
+            throw new AuthenticationException(String.format("Authentication error - %d", status));
+        } else if(status == 404) {
+            response.close();
+            throw new FileNotFoundException(String.format("File not found - %d", status));
+        } else {
+            response.close();
+            throw new IOException(String.format("Unknown Exception - %d", status));
+        }
+    }
+    
+    public Object post(String path, Object request) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = postAsync(path, request);
-        return processPost(future, responseType);
+        return processPost(future);
     }
     
     public Future<ClientResponse> postAsync(String path, Object request) throws IOException {
@@ -140,43 +209,15 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").post(ClientResponse.class, request);
     }
     
-    public Object processPost(Future<ClientResponse> future, GenericType<?> responseType) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public Object processPost(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
         
-        //if(responseType == null) {
-        //    throw new IllegalArgumentException("responseType is null");
-        //}
-        
         // wait for completion
         try {
             ClientResponse response = future.get();
-            if(response.getStatus() >= 200 && response.getStatus() <= 299) {
-                if(responseType == null) {
-                    response.close();
-                    return true;
-                } else {
-                    Object entity = response.getEntity(responseType);
-                    response.close();
-                    return entity;
-                }
-            } else if(response.getStatus() == 401 || response.getStatus() == 403) {
-                response.close();
-                throw new AuthenticationException();
-            } else if(response.getStatus() == 404) {
-                String message = response.toString();
-                response.close();
-                throw new FileNotFoundException(message);
-            } else {
-                RestfulError err = response.getEntity(new GenericType<RestfulError>(){});
-                err.setHttpErrno(response.getStatus());
-                if(response.getLocation() != null) {
-                    err.setPath(response.getLocation().toString());
-                }
-                response.close();
-                throw err.makeException();
-            }
+            return processResponse(response);
         } catch (InterruptedException ex) {
             throw new IOException(ex);
         } catch (ExecutionException ex) {
@@ -184,9 +225,9 @@ public class RestfulClient {
         }
     }
     
-    public Object put(String path, Object request, GenericType<?> responseType) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public Object put(String path, Object request) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = putAsync(path, request);
-        return processPut(future, responseType);
+        return processPut(future);
     }
     
     public Future<ClientResponse> putAsync(String path, Object request) throws IOException {
@@ -205,43 +246,15 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").put(ClientResponse.class, request);
     }
     
-    public Object processPut(Future<ClientResponse> future, GenericType<?> responseType) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public Object processPut(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
         
-        //if(responseType == null) {
-        //    throw new IllegalArgumentException("responseType is null");
-        //}
-        
         // wait for completion
         try {
             ClientResponse response = future.get();
-            if(response.getStatus() >= 200 && response.getStatus() <= 299) {
-                if(responseType == null) {
-                    response.close();
-                    return true;
-                } else {
-                    Object entity = response.getEntity(responseType);
-                    response.close();
-                    return entity;
-                }
-            } else if(response.getStatus() == 401 || response.getStatus() == 403) {
-                response.close();
-                throw new AuthenticationException();
-            } else if(response.getStatus() == 404) {
-                String message = response.toString();
-                response.close();
-                throw new FileNotFoundException(message);
-            } else {
-                RestfulError err = response.getEntity(new GenericType<RestfulError>(){});
-                err.setHttpErrno(response.getStatus());
-                if(response.getLocation() != null) {
-                    err.setPath(response.getLocation().toString());
-                }
-                response.close();
-                throw err.makeException();
-            }
+            return processResponse(response);
         } catch (InterruptedException ex) {
             throw new IOException(ex);
         } catch (ExecutionException ex) {
@@ -249,9 +262,9 @@ public class RestfulClient {
         }
     }
     
-    public Object get(String path, GenericType<?> generic) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public Object get(String path) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = getAsync(path);
-        return processGet(future, generic);
+        return processGet(future);
     }
     
     public Future<ClientResponse> getAsync(String path) throws IOException {
@@ -265,38 +278,15 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").get(ClientResponse.class);
     }
     
-    public Object processGet(Future<ClientResponse> future, GenericType<?> generic) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public Object processGet(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
-        }
-        
-        if(generic == null) {
-            throw new IllegalArgumentException("generic is null");
         }
         
         // wait for completion
         try {
             ClientResponse response = future.get();
-            if(response.getStatus() >= 200 && response.getStatus() <= 299) {
-                Object entity = response.getEntity(generic);
-                response.close();
-                return entity;
-            } else if(response.getStatus() == 401 || response.getStatus() == 403) {
-                response.close();
-                throw new AuthenticationException();
-            } else if(response.getStatus() == 404) {
-                String message = response.toString();
-                response.close();
-                throw new FileNotFoundException(message);
-            } else {
-                RestfulError err = response.getEntity(new GenericType<RestfulError>(){});
-                err.setHttpErrno(response.getStatus());
-                if(response.getLocation() != null) {
-                    err.setPath(response.getLocation().toString());
-                }
-                response.close();
-                throw err.makeException();
-            }
+            return processResponse(response);
         } catch (InterruptedException ex) {
             throw new IOException(ex);
         } catch (ExecutionException ex) {
@@ -304,9 +294,9 @@ public class RestfulClient {
         }
     }
     
-    public Object delete(String path, GenericType<?> generic) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public Object delete(String path) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = deleteAsync(path);
-        return processDelete(future, generic);
+        return processDelete(future);
     }
     
     public Future<ClientResponse> deleteAsync(String path) throws IOException {
@@ -320,43 +310,15 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").delete(ClientResponse.class);
     }
     
-    public Object processDelete(Future<ClientResponse> future, GenericType<?> generic) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public Object processDelete(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
         
-        //if(generic == null) {
-        //    throw new IllegalArgumentException("generic is null");
-        //}
-        
         // wait for completion
         try {
             ClientResponse response = future.get();
-            if(response.getStatus() >= 200 && response.getStatus() <= 299) {
-                if(generic == null) {
-                    response.close();
-                    return true;
-                } else {
-                    Object entity = response.getEntity(generic);
-                    response.close();
-                    return entity;
-                }
-            } else if(response.getStatus() == 401 || response.getStatus() == 403) {
-                response.close();
-                throw new AuthenticationException();
-            } else if(response.getStatus() == 404) {
-                String message = response.toString();
-                response.close();
-                throw new FileNotFoundException(message);
-            } else {
-                RestfulError err = response.getEntity(new GenericType<RestfulError>(){});
-                err.setHttpErrno(response.getStatus());
-                if(response.getLocation() != null) {
-                    err.setPath(response.getLocation().toString());
-                }
-                response.close();
-                throw err.makeException();
-            }
+            return processResponse(response);
         } catch (InterruptedException ex) {
             throw new IOException(ex);
         } catch (ExecutionException ex) {
@@ -364,8 +326,8 @@ public class RestfulClient {
         }
     }
     
-    public InputStream download(String path) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
-        Future<ClientResponse> future = deleteAsync(path);
+    public InputStream download(String path) throws IOException, FileNotFoundException, AuthenticationException {
+        Future<ClientResponse> future = downloadAsync(path);
         return processDownload(future);
     }
     
@@ -380,34 +342,15 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/octet-stream").type("application/json").get(ClientResponse.class);
     }
     
-    public InputStream processDownload(Future<ClientResponse> future) throws IOException, FileNotFoundException, RestfulException, AuthenticationException {
+    public InputStream processDownload(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
         
-        // wait for completition
+        // wait for completion
         try {
             ClientResponse response = future.get();
-            if(response.getStatus() >= 200 && response.getStatus() <= 299) {
-                InputStream entityInputStream = response.getEntityInputStream();
-                //response.close();
-                return entityInputStream;
-            } else if(response.getStatus() == 401 || response.getStatus() == 403) {
-                response.close();
-                throw new AuthenticationException();
-            } else if(response.getStatus() == 404) {
-                String message = response.toString();
-                response.close();
-                throw new FileNotFoundException(message);
-            } else {
-                RestfulError err = response.getEntity(new GenericType<RestfulError>(){});
-                err.setHttpErrno(response.getStatus());
-                if(response.getLocation() != null) {
-                    err.setPath(response.getLocation().toString());
-                }
-                response.close();
-                throw err.makeException();
-            }
+            return processResponseDownload(response);
         } catch (InterruptedException ex) {
             throw new IOException(ex);
         } catch (ExecutionException ex) {
