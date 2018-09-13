@@ -101,7 +101,7 @@ public class TransportServiceInfo {
             throw new IllegalArgumentException("clazz is null");
         }
         
-        this.driverClass = clazz.getCanonicalName();
+        this.driverClass = clazz.getName();
     }
     
     @JsonProperty("driver_class")

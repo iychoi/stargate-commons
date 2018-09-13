@@ -59,7 +59,7 @@ public class DriverInjection extends AbstractImmutableConfig {
     
     @JsonProperty("driver_class")
     public String getDriverClassString() {
-        return this.driverClass.getCanonicalName();
+        return this.driverClass.getName();
     }
     
     @JsonIgnore

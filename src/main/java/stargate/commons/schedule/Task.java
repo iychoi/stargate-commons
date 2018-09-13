@@ -198,7 +198,7 @@ public class Task {
     
     @JsonProperty("task_class")
     public String getTaskClassString() {
-        return this.taskClass.getCanonicalName();
+        return this.taskClass.getName();
     }
     
     @JsonIgnore
@@ -226,7 +226,7 @@ public class Task {
     
     @JsonProperty("value_class")
     public String getValueClassString() {
-        return this.taskClass.getCanonicalName();
+        return this.taskClass.getName();
     }
     
     @JsonIgnore

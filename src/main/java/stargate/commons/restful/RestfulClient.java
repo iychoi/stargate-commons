@@ -134,30 +134,38 @@ public class RestfulClient {
         response.close();
         
         if(status >= 200 && status <= 299) {
-            if(restfulResponse.hasResponse()) {
-                return restfulResponse.getResponse();
-            } else if(restfulResponse.hasException()) {
-                throw new IOException(restfulResponse.getException());
+            if(restfulResponse.isException()) {
+                throw new IOException((String) restfulResponse.getResponse());
             } else {
-                return true;
+                Object obj = restfulResponse.getResponse();
+                if(obj == null) {
+                    return true;
+                }
+                return obj;
             }
         } else if(status == 401 || status == 403) {
-            if(restfulResponse.hasResponse()) {
-                return restfulResponse.getResponse();
-            } else if(restfulResponse.hasException()) {
-                throw new AuthenticationException(restfulResponse.getException());
+            if(restfulResponse.isException()) {
+                throw new AuthenticationException((String) restfulResponse.getResponse());
             } else {
-                throw new AuthenticationException(String.format("Authentication error - %d", status));
+                Object obj = restfulResponse.getResponse();
+                if(obj == null) {
+                    throw new AuthenticationException(String.format("Authentication error - %d", status));
+                }
+                return obj;
             }
         } else if(status == 404) {
-            if(restfulResponse.hasException()) {
-                throw new FileNotFoundException(restfulResponse.getException().getMessage());
+            if(restfulResponse.isException()) {
+                throw new FileNotFoundException((String) restfulResponse.getResponse());
             } else {
-                throw new FileNotFoundException(String.format("File not found - %d", status));
+                Object obj = restfulResponse.getResponse();
+                if(obj == null) {
+                    throw new FileNotFoundException(String.format("File not found - %d", status));
+                }
+                return obj;
             }
         } else {
-            if(restfulResponse.hasException()) {
-                throw new IOException(restfulResponse.getException());
+            if(restfulResponse.isException()) {
+                throw new IOException((String) restfulResponse.getResponse());
             } else {
                 throw new IOException(String.format("Unknown Exception - %d", status));
             }
