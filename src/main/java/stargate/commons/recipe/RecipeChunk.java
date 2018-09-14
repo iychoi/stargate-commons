@@ -51,8 +51,7 @@ public class RecipeChunk {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (RecipeChunk) serializer.fromJsonFile(file, RecipeChunk.class);
+        return (RecipeChunk) JsonSerializer.fromJsonFile(file, RecipeChunk.class);
     }
     
     public static RecipeChunk createInstance(String json) throws IOException {
@@ -60,8 +59,7 @@ public class RecipeChunk {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (RecipeChunk) serializer.fromJson(json, RecipeChunk.class);
+        return (RecipeChunk) JsonSerializer.fromJson(json, RecipeChunk.class);
     }
     
     public RecipeChunk() {
@@ -225,8 +223,7 @@ public class RecipeChunk {
     
     @JsonIgnore
     public synchronized String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -235,7 +232,6 @@ public class RecipeChunk {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
 
 /**
  *
@@ -28,45 +27,36 @@ import org.codehaus.jackson.map.SerializationConfig;
  */
 public class JsonSerializer {
 
-    private ObjectMapper mapper;
-
-    public JsonSerializer() {
-        this.mapper = new ObjectMapper();
-    }
-
-    public JsonSerializer(boolean prettyFormat) {
-        this.mapper = new ObjectMapper();
-        this.mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, prettyFormat);
-    }
-
-    public String toJson(Object obj) throws IOException {
+    private static ObjectMapper MAPPER = new ObjectMapper();
+    
+    public static String toJson(Object obj) throws IOException {
         StringWriter writer = new StringWriter();
-        this.mapper.writeValue(writer, obj);
+        MAPPER.writeValue(writer, obj);
         return writer.getBuffer().toString();
     }
 
-    public void toJsonFile(File f, Object obj) throws IOException {
-        this.mapper.writeValue(f, obj);
+    public static void toJsonFile(File f, Object obj) throws IOException {
+        MAPPER.writeValue(f, obj);
     }
 
-    public Object fromJson(String json, Class<?> cls) throws IOException {
+    public static Object fromJson(String json, Class<?> cls) throws IOException {
         if(json == null) {
             return null;
         }
         StringReader reader = new StringReader(json);
-        return this.mapper.readValue(reader, cls);
+        return MAPPER.readValue(reader, cls);
     }
 
-    public Object fromJsonFile(File f, Class<?> cls) throws IOException {
-        return this.mapper.readValue(f, cls);
+    public static Object fromJsonFile(File f, Class<?> cls) throws IOException {
+        return MAPPER.readValue(f, cls);
     }
     
-    public String formatPretty(String json) throws IOException {
+    public static String formatPretty(String json) throws IOException {
         if(json == null) {
             return null;
         }
         StringReader reader = new StringReader(json);
-        Object obj = this.mapper.readValue(reader, Object.class);
-        return this.mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        Object obj = MAPPER.readValue(reader, Object.class);
+        return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
     }
 }

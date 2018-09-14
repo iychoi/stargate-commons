@@ -41,8 +41,7 @@ public class DriverInjection extends AbstractImmutableConfig {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (DriverInjection) serializer.fromJsonFile(file, DriverInjection.class);
+        return (DriverInjection) JsonSerializer.fromJsonFile(file, DriverInjection.class);
     }
     
     public static DriverInjection createInstance(String json) throws IOException {
@@ -50,8 +49,7 @@ public class DriverInjection extends AbstractImmutableConfig {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (DriverInjection) serializer.fromJson(json, DriverInjection.class);
+        return (DriverInjection) JsonSerializer.fromJson(json, DriverInjection.class);
     }
     
     public DriverInjection() {

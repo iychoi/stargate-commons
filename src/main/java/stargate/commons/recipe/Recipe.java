@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -41,15 +42,14 @@ public class Recipe {
     private String hashAlgorithm;
     private int chunkSize;
     private List<String> nodeNames = new ArrayList<String>();
-    private List<RecipeChunk> chunks = new ArrayList<RecipeChunk>();
+    private Map<String, RecipeChunk> chunks = new HashMap<String, RecipeChunk>();
 
     public static Recipe createInstance(File file) throws IOException {
         if(file == null) {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (Recipe) serializer.fromJsonFile(file, Recipe.class);
+        return (Recipe) JsonSerializer.fromJsonFile(file, Recipe.class);
     }
     
     public static Recipe createInstance(String json) throws IOException {
@@ -57,8 +57,7 @@ public class Recipe {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (Recipe) serializer.fromJson(json, Recipe.class);
+        return (Recipe) JsonSerializer.fromJson(json, Recipe.class);
     }
     
     Recipe() {
@@ -127,7 +126,7 @@ public class Recipe {
         initialize(metadata, hashAlgorithm, chunkSize, nodeNames, chunk);
     }
     
-    private void initialize(DataObjectMetadata metadata, String hashAlgorithm, int chunkSize, Collection<String> nodeNames, Collection<RecipeChunk> chunk) {
+    private void initialize(DataObjectMetadata metadata, String hashAlgorithm, int chunkSize, Collection<String> nodeNames, Collection<RecipeChunk> chunks) {
         if(metadata == null) {
             throw new IllegalArgumentException("metadata is null");
         }
@@ -148,8 +147,10 @@ public class Recipe {
             this.nodeNames.addAll(nodeNames);
         }
         
-        if(chunk != null) {
-            this.chunks.addAll(chunk);
+        if(chunks != null) {
+            for(RecipeChunk chunk : chunks) {
+                this.chunks.put(chunk.getHashString(), chunk);
+            }
         }
     }
     
@@ -221,68 +222,32 @@ public class Recipe {
     
     @JsonProperty("chunks")
     public Collection<RecipeChunk> getChunks() {
-        return Collections.unmodifiableCollection(this.chunks);
+        return this.chunks.values();
     }
     
     @JsonIgnore
     public RecipeChunk getChunk(String hash) {
-        for(RecipeChunk chunk : this.chunks) {
-           boolean has = chunk.hasHash(hash);
-           if(has) {
-               return chunk;
-           }
-        }
-        return null;
-    }
-    
-    @JsonIgnore
-    public RecipeChunk getChunk(long offset) throws IOException {
-        if(this.chunkSize != 0) {
-            // fixed-size chunking
-            int index = (int) (offset / this.chunkSize);
-            RecipeChunk chunk = this.chunks.get(index);
-            
-            if(chunk.getOffset() <= offset && 
-                    chunk.getOffset() + chunk.getLength() > offset) {
-                return chunk;
-            } else {
-                throw new IOException("unable to find a chunk containing offset - " + offset);
-            }
-        } else {
-            // variable-size chunking
-            RecipeChunk searchKey = new RecipeChunk();
-            searchKey.setOffset(offset);
-            searchKey.setLength(0);
-            int location = Collections.binarySearch(this.chunks, searchKey, new Comparator<RecipeChunk>(){
-
-                @Override
-                public int compare(RecipeChunk t, RecipeChunk t1) {
-                    return (int) (t.getOffset() - t1.getOffset());
-                }
-            });
-
-            if(location >= 0) {
-                return this.chunks.get(location);
-            } else {
-                RecipeChunk chunk = this.chunks.get(Math.abs(location + 1));
-                if(chunk.getOffset() <= offset && 
-                        chunk.getOffset() + chunk.getLength() > offset) {
-                    return chunk;
-                } else {
-                    throw new IOException("unable to find a chunk containing offset - " + offset);
-                }
-            }
-        }
+        return this.chunks.get(hash);
     }
     
     @JsonProperty("chunks")
-    public void addChunks(Collection<RecipeChunk> chunk) {
-        this.chunks.addAll(chunk);
+    public void addChunks(Collection<RecipeChunk> chunks) {
+        if(chunks == null) {
+            throw new IllegalArgumentException("chunks is null");
+        }
+        
+        for(RecipeChunk chunk : chunks) {
+            this.chunks.put(chunk.getHashString(), chunk);
+        }
     }
     
     @JsonIgnore
     public void addChunk(RecipeChunk chunk) {
-        this.chunks.add(chunk);
+        if(chunk == null) {
+            throw new IllegalArgumentException("chunk is null");
+        }
+        
+        this.chunks.put(chunk.getHashString(), chunk);
     }
     
     @JsonIgnore
@@ -297,8 +262,7 @@ public class Recipe {
     
     @JsonIgnore
     public String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -307,7 +271,6 @@ public class Recipe {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

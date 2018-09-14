@@ -47,8 +47,7 @@ public class ManagerConfig extends AbstractImmutableConfig {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (ManagerConfig) serializer.fromJsonFile(file, ManagerConfig.class);
+        return (ManagerConfig) JsonSerializer.fromJsonFile(file, ManagerConfig.class);
     }
     
     public static ManagerConfig createInstance(String json) throws IOException {
@@ -56,8 +55,7 @@ public class ManagerConfig extends AbstractImmutableConfig {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (ManagerConfig) serializer.fromJson(json, ManagerConfig.class);
+        return (ManagerConfig) JsonSerializer.fromJson(json, ManagerConfig.class);
     }
     
     public ManagerConfig() {

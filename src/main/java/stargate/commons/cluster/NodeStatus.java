@@ -42,8 +42,7 @@ public class NodeStatus {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (NodeStatus) serializer.fromJsonFile(file, NodeStatus.class);
+        return (NodeStatus) JsonSerializer.fromJsonFile(file, NodeStatus.class);
     }
     
     public static NodeStatus createInstance(String json) throws IOException {
@@ -51,8 +50,7 @@ public class NodeStatus {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (NodeStatus) serializer.fromJson(json, NodeStatus.class);
+        return (NodeStatus) JsonSerializer.fromJson(json, NodeStatus.class);
     }
     
     public NodeStatus() {
@@ -151,8 +149,7 @@ public class NodeStatus {
     
     @JsonIgnore
     public String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -161,7 +158,6 @@ public class NodeStatus {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

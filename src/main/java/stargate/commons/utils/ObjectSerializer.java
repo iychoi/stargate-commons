@@ -32,8 +32,7 @@ public class ObjectSerializer {
             return (String) obj;
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(obj);
+        return JsonSerializer.toJson(obj);
     }
     
     public static Object fromString(String str, Class clazz) throws IOException {
@@ -49,8 +48,7 @@ public class ObjectSerializer {
         if(clazz == String.class) {
             return str;
         } else if(clazz.isPrimitive()) {
-            JsonSerializer serializer = new JsonSerializer();
-            return serializer.fromJson(str, clazz);
+            return JsonSerializer.fromJson(str, clazz);
         }
         
         // cast
@@ -59,8 +57,7 @@ public class ObjectSerializer {
             return instance;
         } catch (NoSuchMethodException ex) {
             // failed
-            JsonSerializer serializer = new JsonSerializer();
-            return serializer.fromJson(str, clazz);
+            return JsonSerializer.fromJson(str, clazz);
         } catch (Exception ex) {
             throw new IOException(ex);
         }
@@ -79,8 +76,7 @@ public class ObjectSerializer {
             return str.getBytes();
         } else {
             // other complex classes
-            JsonSerializer serializer = new JsonSerializer();
-            String json = serializer.toJson(obj);
+            String json = JsonSerializer.toJson(obj);
             return json.getBytes();
         }
     }
@@ -100,9 +96,8 @@ public class ObjectSerializer {
         } else if(clazz == String.class) {
             return new String(byteArr);
         } else if(clazz.isPrimitive()) {
-            JsonSerializer serializer = new JsonSerializer();
             String json = new String(byteArr);
-            return serializer.fromJson(json, clazz);
+            return JsonSerializer.fromJson(json, clazz);
         }
         
         // cast
@@ -112,8 +107,7 @@ public class ObjectSerializer {
             return instance;
         } catch (NoSuchMethodException ex) {
             // failed
-            JsonSerializer serializer = new JsonSerializer();
-            return serializer.fromJson(json, clazz);
+            return JsonSerializer.fromJson(json, clazz);
         } catch (Exception ex) {
             throw new IOException(ex);
         }

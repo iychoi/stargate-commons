@@ -41,8 +41,7 @@ public class DataExportEntry {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (DataExportEntry) serializer.fromJsonFile(file, DataExportEntry.class);
+        return (DataExportEntry) JsonSerializer.fromJsonFile(file, DataExportEntry.class);
     }
     
     public static DataExportEntry createInstance(String json) throws IOException {
@@ -50,8 +49,7 @@ public class DataExportEntry {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (DataExportEntry) serializer.fromJson(json, DataExportEntry.class);
+        return (DataExportEntry) JsonSerializer.fromJson(json, DataExportEntry.class);
     }
     
     DataExportEntry() {
@@ -153,8 +151,7 @@ public class DataExportEntry {
     
     @JsonIgnore
     public String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -163,7 +160,6 @@ public class DataExportEntry {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

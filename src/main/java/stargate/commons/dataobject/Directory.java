@@ -46,8 +46,7 @@ public class Directory {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (Directory) serializer.fromJsonFile(file, Directory.class);
+        return (Directory) JsonSerializer.fromJsonFile(file, Directory.class);
     }
     
     public static Directory createInstance(String json) throws IOException {
@@ -55,8 +54,7 @@ public class Directory {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (Directory) serializer.fromJson(json, Directory.class);
+        return (Directory) JsonSerializer.fromJson(json, Directory.class);
     }
     
     Directory() {
@@ -188,8 +186,7 @@ public class Directory {
     
     @JsonIgnore
     public synchronized String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -198,8 +195,7 @@ public class Directory {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
     
     @JsonIgnore

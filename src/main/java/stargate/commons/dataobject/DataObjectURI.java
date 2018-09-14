@@ -35,6 +35,7 @@ public class DataObjectURI implements Comparable {
     private static final Log LOG = LogFactory.getLog(DataObjectURI.class);
     
     public static final String STARGATE_SCHEME = "sgfs";
+    public static final String WILDCARD_LOCAL_CLUSTER_NAME = "local";
 
     private URI uri;
     

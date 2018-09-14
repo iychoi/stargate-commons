@@ -56,6 +56,7 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract void syncRecipes() throws IOException;
     
     public abstract InputStream getDataChunk(String hash) throws IOException;
+    public abstract InputStream getDataChunk(String clusterName, String hash) throws IOException;
     
     public abstract boolean schedulePrefetch(DataObjectURI uri, String hash) throws IOException;
     public abstract Collection<String> listDataSources() throws IOException;

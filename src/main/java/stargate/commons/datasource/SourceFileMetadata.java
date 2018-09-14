@@ -42,8 +42,7 @@ public class SourceFileMetadata {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (SourceFileMetadata) serializer.fromJsonFile(file, SourceFileMetadata.class);
+        return (SourceFileMetadata) JsonSerializer.fromJsonFile(file, SourceFileMetadata.class);
     }
     
     public static SourceFileMetadata createInstance(String json) throws IOException {
@@ -51,8 +50,7 @@ public class SourceFileMetadata {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (SourceFileMetadata) serializer.fromJson(json, SourceFileMetadata.class);
+        return (SourceFileMetadata) JsonSerializer.fromJson(json, SourceFileMetadata.class);
     }
     
     SourceFileMetadata() {
@@ -175,8 +173,7 @@ public class SourceFileMetadata {
     
     @JsonIgnore
     public String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -185,7 +182,6 @@ public class SourceFileMetadata {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

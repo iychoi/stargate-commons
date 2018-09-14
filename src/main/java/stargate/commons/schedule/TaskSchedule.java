@@ -40,8 +40,7 @@ public class TaskSchedule extends Task {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (TaskSchedule) serializer.fromJsonFile(file, TaskSchedule.class);
+        return (TaskSchedule) JsonSerializer.fromJsonFile(file, TaskSchedule.class);
     }
     
     public static TaskSchedule createInstance(String json) throws IOException {
@@ -49,8 +48,7 @@ public class TaskSchedule extends Task {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (TaskSchedule) serializer.fromJson(json, TaskSchedule.class);
+        return (TaskSchedule) JsonSerializer.fromJson(json, TaskSchedule.class);
     }
     
     TaskSchedule() {

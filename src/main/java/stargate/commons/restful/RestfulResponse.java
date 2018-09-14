@@ -47,13 +47,11 @@ public class RestfulResponse {
                 this.responseClass = String.class;
                 StringWriter sw = new StringWriter();
                 ex.printStackTrace(new PrintWriter(sw));
-                JsonSerializer serializer = new JsonSerializer();
-                this.responseJson = serializer.toJson(sw.toString());
+                this.responseJson = JsonSerializer.toJson(sw.toString());
                 this.exception = true;
             } else {
                 this.responseClass = response.getClass();
-                JsonSerializer serializer = new JsonSerializer();
-                this.responseJson = serializer.toJson(response);
+                this.responseJson = JsonSerializer.toJson(response);
                 this.exception = false;
             }
         } else {
@@ -107,8 +105,7 @@ public class RestfulResponse {
             this.responseJson = null;
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        this.responseJson = serializer.toJson(response);
+        this.responseJson = JsonSerializer.toJson(response);
     }
     
     @JsonProperty("response")
@@ -122,8 +119,7 @@ public class RestfulResponse {
             return null;
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.fromJson(this.responseJson, this.responseClass);
+        return JsonSerializer.fromJson(this.responseJson, this.responseClass);
     }
     
     @JsonProperty("response")

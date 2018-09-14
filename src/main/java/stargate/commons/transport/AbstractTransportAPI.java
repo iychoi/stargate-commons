@@ -39,4 +39,5 @@ public abstract class AbstractTransportAPI {
     public abstract Directory getDirectory(DataObjectURI uri) throws IOException;
     public abstract Recipe getRecipe(DataObjectURI uri) throws IOException;
     public abstract InputStream getDataChunk(String hash) throws IOException;
+    public abstract InputStream getDataChunk(String clusterName, String hash) throws IOException;
 }

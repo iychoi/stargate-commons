@@ -49,8 +49,7 @@ public class Task {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (Task) serializer.fromJsonFile(file, Task.class);
+        return (Task) JsonSerializer.fromJsonFile(file, Task.class);
     }
     
     public static Task createInstance(String json) throws IOException {
@@ -58,8 +57,7 @@ public class Task {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (Task) serializer.fromJson(json, Task.class);
+        return (Task) JsonSerializer.fromJson(json, Task.class);
     }
     
     Task() {
@@ -287,8 +285,7 @@ public class Task {
     
     @JsonIgnore
     public String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -297,7 +294,6 @@ public class Task {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

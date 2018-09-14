@@ -40,8 +40,7 @@ public class TransportServiceInfo {
             throw new IllegalArgumentException("file is null");
         }
 
-        JsonSerializer serializer = new JsonSerializer();
-        return (TransportServiceInfo) serializer.fromJsonFile(file, TransportServiceInfo.class);
+        return (TransportServiceInfo) JsonSerializer.fromJsonFile(file, TransportServiceInfo.class);
     }
     
     public static TransportServiceInfo createInstance(String json) throws IOException {
@@ -49,8 +48,7 @@ public class TransportServiceInfo {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (TransportServiceInfo) serializer.fromJson(json, TransportServiceInfo.class);
+        return (TransportServiceInfo) JsonSerializer.fromJson(json, TransportServiceInfo.class);
     }
     
     public TransportServiceInfo() {
@@ -132,8 +130,7 @@ public class TransportServiceInfo {
 
     @JsonIgnore
     public synchronized String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -142,7 +139,6 @@ public class TransportServiceInfo {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

@@ -39,8 +39,7 @@ public abstract class AbstractImmutableConfig {
     
     @JsonIgnore
     public synchronized String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -49,7 +48,6 @@ public abstract class AbstractImmutableConfig {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }

@@ -47,8 +47,7 @@ public class Cluster {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (Cluster) serializer.fromJsonFile(file, Cluster.class);
+        return (Cluster) JsonSerializer.fromJsonFile(file, Cluster.class);
     }
     
     public static Cluster createInstance(String json) throws IOException {
@@ -56,8 +55,7 @@ public class Cluster {
             throw new IllegalArgumentException("json is null or empty");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        return (Cluster) serializer.fromJson(json, Cluster.class);
+        return (Cluster) JsonSerializer.fromJson(json, Cluster.class);
     }
     
     Cluster() {
@@ -274,8 +272,7 @@ public class Cluster {
     
     @JsonIgnore
     public String toJson() throws IOException {
-        JsonSerializer serializer = new JsonSerializer();
-        return serializer.toJson(this);
+        return JsonSerializer.toJson(this);
     }
     
     @JsonIgnore
@@ -284,7 +281,6 @@ public class Cluster {
             throw new IllegalArgumentException("file is null");
         }
         
-        JsonSerializer serializer = new JsonSerializer();
-        serializer.toJsonFile(file, this);
+        JsonSerializer.toJsonFile(file, this);
     }
 }
