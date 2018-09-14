@@ -42,7 +42,8 @@ public class Recipe {
     private String hashAlgorithm;
     private int chunkSize;
     private List<String> nodeNames = new ArrayList<String>();
-    private Map<String, RecipeChunk> chunks = new HashMap<String, RecipeChunk>();
+    private List<RecipeChunk> chunks = new ArrayList<RecipeChunk>(); // for order
+    private Map<String, Integer> chunkHashes = new HashMap<String, Integer>(); // for hash-idx conv
 
     public static Recipe createInstance(File file) throws IOException {
         if(file == null) {
@@ -149,7 +150,8 @@ public class Recipe {
         
         if(chunks != null) {
             for(RecipeChunk chunk : chunks) {
-                this.chunks.put(chunk.getHashString(), chunk);
+                this.chunks.add(chunk);
+                this.chunkHashes.put(chunk.getHashString(), this.chunks.size() - 1);
             }
         }
     }
@@ -185,74 +187,92 @@ public class Recipe {
     }
     
     @JsonProperty("node_names")
-    public Collection<String> getNodeNames() {
+    public synchronized Collection<String> getNodeNames() {
         return Collections.unmodifiableCollection(this.nodeNames);
     }
     
     @JsonIgnore
-    public String getNodeName(int nodeID) {
+    public synchronized String getNodeName(int nodeID) {
         return this.nodeNames.get(nodeID);
     }
     
     @JsonIgnore
-    public int getNodeID(String nodeName) {
+    public synchronized int getNodeID(String nodeName) {
         return this.nodeNames.indexOf(nodeName);
     }
     
     @JsonProperty("node_names")
-    public void addNodeNames(Collection<String> nodeNames) {
+    public synchronized void addNodeNames(Collection<String> nodeNames) {
         this.nodeNames.addAll(nodeNames);
     }
     
     @JsonIgnore
-    public void addNodeName(String nodeName) {
+    public synchronized void addNodeName(String nodeName) {
         this.nodeNames.add(nodeName);
     }
     
     @JsonIgnore
-    public int addNodeNameAndReturnID(String nodeName) {
+    public synchronized int addNodeNameAndReturnID(String nodeName) {
         this.nodeNames.add(nodeName);
         return this.nodeNames.size() - 1;
     }
     
     @JsonIgnore
-    public void clearNodeNames() {
+    public synchronized void clearNodeNames() {
         this.nodeNames.clear();
     }
     
     @JsonProperty("chunks")
-    public Collection<RecipeChunk> getChunks() {
-        return this.chunks.values();
+    public synchronized Collection<RecipeChunk> getChunks() {
+        return Collections.unmodifiableCollection(this.chunks);
     }
     
     @JsonIgnore
-    public RecipeChunk getChunk(String hash) {
-        return this.chunks.get(hash);
+    public synchronized RecipeChunk getChunk(String hash) {
+        Integer idx = this.chunkHashes.get(hash);
+        if(idx == null) {
+            return null;
+        }
+        return this.chunks.get(idx);
+    }
+    
+    @JsonIgnore
+    public synchronized RecipeChunk getChunk(long offset) {
+        for(RecipeChunk chunk : this.chunks) {
+            if(chunk.getOffset() < offset &&
+                    chunk.getOffset() + chunk.getLength() > offset) {
+                return chunk;
+            }
+        }
+        return null;
     }
     
     @JsonProperty("chunks")
-    public void addChunks(Collection<RecipeChunk> chunks) {
+    public synchronized void addChunks(Collection<RecipeChunk> chunks) {
         if(chunks == null) {
             throw new IllegalArgumentException("chunks is null");
         }
         
         for(RecipeChunk chunk : chunks) {
-            this.chunks.put(chunk.getHashString(), chunk);
+            this.chunks.add(chunk);
+            this.chunkHashes.put(chunk.getHashString(), this.chunks.size() - 1);
         }
     }
     
     @JsonIgnore
-    public void addChunk(RecipeChunk chunk) {
+    public synchronized void addChunk(RecipeChunk chunk) {
         if(chunk == null) {
             throw new IllegalArgumentException("chunk is null");
         }
         
-        this.chunks.put(chunk.getHashString(), chunk);
+        this.chunks.add(chunk);
+        this.chunkHashes.put(chunk.getHashString(), this.chunks.size() - 1);
     }
     
     @JsonIgnore
-    public void clearChunks() {
+    public synchronized void clearChunks() {
         this.chunks.clear();
+        this.chunkHashes.clear();
     }
     
     @Override

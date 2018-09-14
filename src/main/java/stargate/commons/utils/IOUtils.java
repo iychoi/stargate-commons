@@ -56,4 +56,18 @@ public class IOUtils {
     public static void writeString(OutputStream os, String json) throws IOException {
         write(os, json.getBytes());
     }
+    
+    public static byte[] toByteArray(final InputStream input) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        
+        byte[] buffer = new byte[BUFFER_SIZE];
+        long count = 0;
+        int read;
+        while ((read = input.read(buffer)) != 0) {
+            output.write(buffer, 0, read);
+            count += read;
+        }
+        
+        return output.toByteArray();
+    }
 }

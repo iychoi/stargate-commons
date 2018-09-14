@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import stargate.commons.cluster.Cluster;
-import stargate.commons.config.AbstractImmutableConfig;
 import stargate.commons.dataobject.DataObjectMetadata;
 import stargate.commons.dataobject.DataObjectURI;
 import stargate.commons.datasource.DataExportEntry;
 import stargate.commons.recipe.Recipe;
+import stargate.commons.service.ServiceConfig;
 
 /**
  *
@@ -31,7 +31,7 @@ import stargate.commons.recipe.Recipe;
  */
 public abstract class AbstractUserInterfaceAPI {
     public abstract boolean isLive() throws IOException;
-    public abstract AbstractImmutableConfig getServiceConfig() throws IOException;
+    public abstract String getServiceConfig() throws IOException;
     
     public abstract Cluster getCluster() throws IOException;
     
