@@ -197,6 +197,20 @@ public class Recipe {
     }
     
     @JsonIgnore
+    public Collection<String> getNodeNames(Collection<Integer> nodeIDs) throws IOException {
+        List<String> names = new ArrayList<String>();
+        for(int id : nodeIDs) {
+            String name = this.nodeNames.get(id);
+            if(name == null || name.isEmpty()) {
+                throw new IOException(String.format("Cannot convert node id (%d) to name", id));
+            }
+            
+            names.add(name);
+        }
+        return Collections.unmodifiableCollection(names);
+    }
+    
+    @JsonIgnore
     public synchronized int getNodeID(String nodeName) {
         return this.nodeNames.indexOf(nodeName);
     }
@@ -239,7 +253,7 @@ public class Recipe {
     @JsonIgnore
     public synchronized RecipeChunk getChunk(long offset) {
         for(RecipeChunk chunk : this.chunks) {
-            if(chunk.getOffset() < offset &&
+            if(chunk.getOffset() <= offset &&
                     chunk.getOffset() + chunk.getLength() > offset) {
                 return chunk;
             }

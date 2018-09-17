@@ -16,6 +16,7 @@
 package stargate.commons.userinterface;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  *
@@ -26,6 +27,7 @@ public abstract class AbstractUserInterfaceClient extends AbstractUserInterfaceA
     public abstract void disconnect();
     public abstract boolean isConnected();
     
+    public abstract URI getServiceURI();
     public abstract long getConnectionEstablishedTime();
     public abstract long getLastActiveTime();
 }

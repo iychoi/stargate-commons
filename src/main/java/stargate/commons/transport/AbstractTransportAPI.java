@@ -32,7 +32,7 @@ import stargate.commons.recipe.Recipe;
 public abstract class AbstractTransportAPI {
     public abstract boolean isLive() throws IOException;
     
-    public abstract Cluster getCluster() throws IOException;
+    public abstract Cluster getLocalCluster() throws IOException;
 
     public abstract DataObjectMetadata getDataObjectMetadata(DataObjectURI uri) throws FileNotFoundException, IOException;
     public abstract Collection<DataObjectMetadata> listDataObjectMetadata(DataObjectURI uri) throws IOException;

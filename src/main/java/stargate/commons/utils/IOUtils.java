@@ -63,7 +63,7 @@ public class IOUtils {
         byte[] buffer = new byte[BUFFER_SIZE];
         long count = 0;
         int read;
-        while ((read = input.read(buffer)) != 0) {
+        while ((read = input.read(buffer)) > 0) {
             output.write(buffer, 0, read);
             count += read;
         }

@@ -16,6 +16,7 @@
 package stargate.commons.transport;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  *
@@ -27,6 +28,7 @@ public abstract class AbstractTransportClient extends AbstractTransportAPI {
     public abstract void disconnect();
     public abstract boolean isConnected();
     
+    public abstract URI getServiceURI();
     public abstract long getConnectionEstablishedTime();
     public abstract long getLastActiveTime();
 }

@@ -26,6 +26,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
 import stargate.commons.transport.TransportServiceInfo;
+import stargate.commons.userinterface.UserInterfaceServiceInfo;
 import stargate.commons.utils.IPUtils;
 
 /**
@@ -40,6 +41,7 @@ public class Node {
     private String clusterName;
     private NodeStatus status;
     private TransportServiceInfo transportServiceInfo;
+    private UserInterfaceServiceInfo userInterfaceServiceInfo;
     private HashSet<String> hostNames = new HashSet<String>();
     
     public static Node createInstance(File file) throws IOException {
@@ -63,9 +65,10 @@ public class Node {
         this.clusterName = null;
         this.status = null;
         this.transportServiceInfo = null;
+        this.userInterfaceServiceInfo = null;
     }
     
-    public Node(String name, String clusterName, NodeStatus status, TransportServiceInfo transportServiceInfo) {
+    public Node(String name, String clusterName, NodeStatus status, TransportServiceInfo transportServiceInfo, UserInterfaceServiceInfo userInterfaceServiceInfo) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -82,10 +85,14 @@ public class Node {
             throw new IllegalArgumentException("transportServiceInfo is null");
         }
         
-        initialize(name, clusterName, status, transportServiceInfo, null);
+        if(userInterfaceServiceInfo == null) {
+            throw new IllegalArgumentException("userInterfaceServiceInfo is null");
+        }
+        
+        initialize(name, clusterName, status, transportServiceInfo, userInterfaceServiceInfo, null);
     }
     
-    public Node(String name, String clusterName, NodeStatus status, TransportServiceInfo transportServiceInfo, Collection<String> hostNames) {
+    public Node(String name, String clusterName, NodeStatus status, TransportServiceInfo transportServiceInfo, UserInterfaceServiceInfo userInterfaceServiceInfo, Collection<String> hostNames) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -102,14 +109,19 @@ public class Node {
             throw new IllegalArgumentException("transportServiceInfo is null");
         }
         
-        initialize(name, clusterName, status, transportServiceInfo, hostNames);
+        if(userInterfaceServiceInfo == null) {
+            throw new IllegalArgumentException("userInterfaceServiceInfo is null");
+        }
+        
+        initialize(name, clusterName, status, transportServiceInfo, userInterfaceServiceInfo, hostNames);
     }
     
-    private void initialize(String name, String clusterName, NodeStatus status, TransportServiceInfo transportServiceInfo, Collection<String> hostNames) {
+    private void initialize(String name, String clusterName, NodeStatus status, TransportServiceInfo transportServiceInfo, UserInterfaceServiceInfo userInterfaceServiceInfo, Collection<String> hostNames) {
         this.name = name;
         this.clusterName = clusterName;
         this.status = status;
         this.transportServiceInfo = transportServiceInfo;
+        this.userInterfaceServiceInfo = userInterfaceServiceInfo;
         
         if(hostNames != null) {
             addHostNames(hostNames);
@@ -160,7 +172,7 @@ public class Node {
 
     @JsonProperty("transport_service_info")
     public TransportServiceInfo getTransportServiceInfo() {
-        return transportServiceInfo;
+        return this.transportServiceInfo;
     }
 
     @JsonProperty("transport_service_info")
@@ -170,6 +182,20 @@ public class Node {
         }
         
         this.transportServiceInfo = transportServiceInfo;
+    }
+    
+    @JsonProperty("userinterface_service_info")
+    public UserInterfaceServiceInfo getUserInterfaceServiceInfo() {
+        return this.userInterfaceServiceInfo;
+    }
+
+    @JsonProperty("userinterface_service_info")
+    public void setUserInterfaceServiceInfo(UserInterfaceServiceInfo userInterfaceServiceInfo) {
+        if(userInterfaceServiceInfo == null) {
+            throw new IllegalArgumentException("userInterfaceServiceInfo is null");
+        }
+        
+        this.userInterfaceServiceInfo = userInterfaceServiceInfo;
     }
     
     @JsonProperty("hostnames")

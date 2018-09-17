@@ -23,7 +23,6 @@ import stargate.commons.dataobject.DataObjectMetadata;
 import stargate.commons.dataobject.DataObjectURI;
 import stargate.commons.datasource.DataExportEntry;
 import stargate.commons.recipe.Recipe;
-import stargate.commons.service.ServiceConfig;
 
 /**
  *
@@ -33,7 +32,9 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract boolean isLive() throws IOException;
     public abstract String getServiceConfig() throws IOException;
     
-    public abstract Cluster getCluster() throws IOException;
+    public abstract Cluster getCluster(String name) throws IOException;
+    
+    public abstract Cluster getLocalCluster() throws IOException;
     
     public abstract Collection<String> listRemoteClusters() throws IOException;
     public abstract Collection<Cluster> getRemoteClusters() throws IOException;
