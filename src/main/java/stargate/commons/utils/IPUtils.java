@@ -216,4 +216,14 @@ public class IPUtils {
         
         return false;
     }
+    
+    public static boolean containLocalIPAddress(Collection<String> addresses) throws IOException {
+        for(String address : addresses) {
+            boolean result = isLocalIPAddress(address);
+            if(result) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
