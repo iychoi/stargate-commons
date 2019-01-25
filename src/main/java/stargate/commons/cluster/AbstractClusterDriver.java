@@ -24,6 +24,9 @@ import stargate.commons.driver.AbstractDriver;
  */
 public abstract class AbstractClusterDriver extends AbstractDriver {
     
+    public abstract void activateCluster() throws IOException;
+    public abstract boolean isClusterActive() throws IOException;
+    
     public abstract Node getLocalNode() throws IOException;
     public abstract Cluster getLocalCluster() throws IOException;
     public abstract String getLeaderNodeName() throws IOException;

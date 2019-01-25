@@ -38,6 +38,8 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract Cluster getCluster(String name) throws IOException;
     
     public abstract Cluster getLocalCluster() throws IOException;
+    public abstract void activateCluster() throws IOException;
+    public abstract boolean isClusterActive() throws IOException;
     public abstract Node getLocalNode() throws IOException;
     
     public abstract Collection<String> listRemoteClusters() throws IOException;
