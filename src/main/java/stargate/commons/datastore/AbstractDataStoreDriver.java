@@ -13,28 +13,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.schedule;
+package stargate.commons.datastore;
+
+import java.io.IOException;
+import stargate.commons.driver.AbstractDriver;
 
 /**
  *
  * @author iychoi
  */
-public enum EnumTaskPriority {
-    TASK_PRIORITY_HIGH(10),
-    TASK_PRIORITY_MID(5),
-    TASK_PRIORITY_LOW(1);
-    
-    private int numPriority;
-    
-    EnumTaskPriority(int num) {
-        this.numPriority = num;
-    }
-    
-    public int getPriorityNum() {
-        return this.numPriority;
-    }
-    
-    public static int getPriorityNum(EnumTaskPriority priority) {
-        return priority.numPriority;
-    }
+public abstract class AbstractDataStoreDriver extends AbstractDriver {
+    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property) throws IOException;
+    public abstract AbstractQueue getQueue(String name, Class valueClass, EnumDataStoreProperty property) throws IOException;
 }

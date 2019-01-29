@@ -15,13 +15,9 @@
 */
 package stargate.commons.schedule;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.annotate.JsonProperty;
-import stargate.commons.utils.JsonSerializer;
 
 /**
  *
@@ -35,22 +31,6 @@ public class TaskSchedule extends Task {
     protected long delay; // in sec
     protected long interval; // in sec
     
-    public static TaskSchedule createInstance(File file) throws IOException {
-        if(file == null) {
-            throw new IllegalArgumentException("file is null");
-        }
-
-        return (TaskSchedule) JsonSerializer.fromJsonFile(file, TaskSchedule.class);
-    }
-    
-    public static TaskSchedule createInstance(String json) throws IOException {
-        if(json == null || json.isEmpty()) {
-            throw new IllegalArgumentException("json is null or empty");
-        }
-        
-        return (TaskSchedule) JsonSerializer.fromJson(json, TaskSchedule.class);
-    }
-    
     TaskSchedule() {
         super();
         
@@ -59,14 +39,14 @@ public class TaskSchedule extends Task {
         this.interval = 0;
     }
     
-    public TaskSchedule(String name, Class taskClass, Class valueClass, Object value, EnumTaskPriority priority, boolean repeat, long delay, long interval) {
-        super(name, taskClass, valueClass, value, priority);
+    public TaskSchedule(String name, Runnable runnable, Object param, boolean repeat, long delay, long interval) {
+        super(name, runnable, param);
         
         initialize(repeat, delay, interval);
     }
     
-    public TaskSchedule(String name, Class taskClass, Class valueClass, Object value, Collection<String> nodeNames, EnumTaskPriority priority,  boolean repeat, long delay, long interval) {
-        super(name, taskClass, valueClass, value, nodeNames, priority);
+    public TaskSchedule(String name, Runnable runnable, Object param, Collection<String> nodeNames, boolean repeat, long delay, long interval) {
+        super(name, runnable, param, nodeNames);
         
         initialize(repeat, delay, interval);
     }
@@ -77,32 +57,26 @@ public class TaskSchedule extends Task {
         this.interval = Math.max(0, interval);
     }
     
-    @JsonProperty("repeat")
     public void setRepeat(boolean repeat) {
         this.repeat = repeat;
     }
     
-    @JsonProperty("repeat")
     public boolean isRepeat() {
         return this.repeat;
     }
     
-    @JsonProperty("delay")
     public void setDelay(long delay) {
         this.delay = Math.max(delay, 0);
     }
     
-    @JsonProperty("delay")
     public long getDelay() {
         return this.delay;
     }
     
-    @JsonProperty("interval")
     public void setInterval(long interval) {
         this.interval = Math.max(0, interval);
     }
     
-    @JsonProperty("interval")
     public long getInterval() {
         return this.interval;
     }

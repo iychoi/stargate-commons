@@ -91,6 +91,23 @@ public class RecipeChunk {
         initialize(offset, length, hash, nodeIDs);
     }
     
+    public RecipeChunk(long offset, int length, String hash, Collection<Integer> nodeIDs) {
+        if(offset < 0) {
+            throw new IllegalArgumentException("offset is invalid");
+        }
+        
+        if(length < 0) {
+            throw new IllegalArgumentException("length is invalid");
+        }
+        
+        if(hash == null || hash.isEmpty()) {
+            throw new IllegalArgumentException("hash is null or empty");
+        }
+        
+        byte[] hashbytes = HexUtils.toBytes(hash);
+        initialize(offset, length, hashbytes, nodeIDs);
+    }
+    
     private void initialize(long offset, int length, byte[] hash, Collection<Integer> nodeIDs) {
         if(offset < 0) {
             throw new IllegalArgumentException("offset is invalid");

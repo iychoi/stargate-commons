@@ -27,6 +27,7 @@ public abstract class AbstractRecipeDriver extends AbstractDriver {
     public abstract int getChunkSize();
     public abstract String getHashAlgorithm();
     
-    public abstract String calculateHash(byte[] buffer) throws IOException;
-    public abstract RecipeChunk produceRecipeChunk(InputStream is) throws IOException;
+    public abstract byte[] calculateHash(byte[] buffer) throws IOException;
+    public abstract RecipeChunk produceRecipeChunk(InputStream is, long offset) throws IOException;
+    public abstract RecipeChunk produceRecipeChunk(byte[] buffer, long offset, int len) throws IOException;
 }

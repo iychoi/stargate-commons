@@ -35,7 +35,7 @@ public class ServiceConfig extends AbstractImmutableConfig {
     
     protected ManagerConfig clusterManagerConfig;
     protected ManagerConfig dataSourceManagerConfig;
-    protected ManagerConfig keyValueStoreManagerConfig;
+    protected ManagerConfig dataStoreManagerConfig;
     protected ManagerConfig recipeManagerConfig;
     protected ManagerConfig transportManagerConfig;
     protected ManagerConfig userInterfaceManagerConfig;
@@ -73,8 +73,8 @@ public class ServiceConfig extends AbstractImmutableConfig {
             this.dataSourceManagerConfig.setImmutable();
         }
         
-        if(this.keyValueStoreManagerConfig != null) {
-            this.keyValueStoreManagerConfig.setImmutable();
+        if(this.dataStoreManagerConfig != null) {
+            this.dataStoreManagerConfig.setImmutable();
         }
     
         if(this.recipeManagerConfig != null) {
@@ -126,20 +126,20 @@ public class ServiceConfig extends AbstractImmutableConfig {
         return this.dataSourceManagerConfig;
     }
     
-    @JsonProperty("keyvalue_store")
-    public void setKeyValueStoreConfig(ManagerConfig keyValueStoreConfig) {
-        if(keyValueStoreConfig == null) {
-            throw new IllegalArgumentException("keyValueStoreConfig is null");
+    @JsonProperty("data_store")
+    public void setDataStoreConfig(ManagerConfig dataStoreConfig) {
+        if(dataStoreConfig == null) {
+            throw new IllegalArgumentException("dataStoreConfig is null");
         }
         
         super.checkMutableAndRaiseException();
         
-        this.keyValueStoreManagerConfig = keyValueStoreConfig;
+        this.dataStoreManagerConfig = dataStoreConfig;
     }
     
-    @JsonProperty("keyvalue_store")
-    public ManagerConfig getKeyValueStoreConfig() {
-        return this.keyValueStoreManagerConfig;
+    @JsonProperty("data_store")
+    public ManagerConfig getDataStoreConfig() {
+        return this.dataStoreManagerConfig;
     }
     
     @JsonProperty("recipe")

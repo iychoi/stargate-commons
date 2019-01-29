@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.keyvaluestore;
+package stargate.commons.datastore;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import java.util.Map;
 public abstract class AbstractKeyValueStore {
     public abstract String getName();
     public abstract Class getValueClass();
-    public abstract EnumKeyValueStoreProperty getProperty();
+    public abstract EnumDataStoreProperty getProperty();
     
     public abstract int size();
     public abstract boolean isEmpty();

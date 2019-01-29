@@ -13,15 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.keyvaluestore;
+package stargate.commons.datastore;
 
-import java.io.IOException;
-import stargate.commons.driver.AbstractDriver;
+import stargate.commons.driver.AbstractDriverConfig;
 
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractKeyValueStoreDriver extends AbstractDriver {
-    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumKeyValueStoreProperty property) throws IOException;
+public abstract class AbstractDataStoreDriverConfig extends AbstractDriverConfig {
+    
 }

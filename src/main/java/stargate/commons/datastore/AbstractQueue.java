@@ -13,14 +13,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.keyvaluestore;
+package stargate.commons.datastore;
 
-import stargate.commons.driver.AbstractDriverConfig;
+import java.io.IOException;
+import java.util.List;
 
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractKeyValueStoreDriverConfig extends AbstractDriverConfig {
+public abstract class AbstractQueue {
+    public abstract String getName();
+    public abstract Class getValueClass();
+    public abstract EnumDataStoreProperty getProperty();
     
+    public abstract int size();
+    public abstract boolean isEmpty();
+    
+    public abstract Object dequeue() throws IOException;
+    public abstract void enqueue(Object value) throws IOException;
+    public abstract void clear() throws IOException;
+    public abstract List<Object> toList() throws IOException;
 }
