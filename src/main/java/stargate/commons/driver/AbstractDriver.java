@@ -44,7 +44,7 @@ public abstract class AbstractDriver {
             throw new IllegalStateException(getName() + " is already initialized");
         }
         
-        LOG.info(String.format("Driver %s is initializing...", getName()));
+        LOG.debug(String.format("Driver %s is initializing...", getName()));
         
         this.initialized = true;
     }
@@ -56,7 +56,7 @@ public abstract class AbstractDriver {
         
         this.initialized = false;
         
-        LOG.info(String.format("Driver %s is uninitialized...", getName()));
+        LOG.debug(String.format("Driver %s is uninitialized...", getName()));
     }
     
     public boolean isStarted() {
