@@ -16,6 +16,7 @@
 package stargate.commons.schedule;
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,14 +40,14 @@ public class TaskSchedule extends Task {
         this.interval = 0;
     }
     
-    public TaskSchedule(String name, Runnable runnable, Object param, boolean repeat, long delay, long interval) {
-        super(name, runnable, param);
+    public TaskSchedule(String name, Callable callable, Object param, boolean repeat, long delay, long interval) {
+        super(name, callable, param);
         
         initialize(repeat, delay, interval);
     }
     
-    public TaskSchedule(String name, Runnable runnable, Object param, Collection<String> nodeNames, boolean repeat, long delay, long interval) {
-        super(name, runnable, param, nodeNames);
+    public TaskSchedule(String name, Callable callable, Object param, Collection<String> nodeNames, boolean repeat, long delay, long interval) {
+        super(name, callable, param, nodeNames);
         
         initialize(repeat, delay, interval);
     }

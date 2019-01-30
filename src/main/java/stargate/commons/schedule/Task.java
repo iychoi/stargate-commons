@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,13 +34,13 @@ public class Task {
     
     protected String name;
     protected Set<String> nodeNames = new HashSet<String>();
-    protected Runnable runnable;
+    protected Callable<?> callable;
     protected Object param;
-    protected Future<Object> future;
+    protected Future<?> future;
     
     Task() {
         this.name = null;
-        this.runnable = null;
+        this.callable = null;
         this.param = null;
         this.future = null;
     }
@@ -60,29 +61,29 @@ public class Task {
         initialize(name, null, param, nodeNames);
     }
     
-    public Task(String name, Runnable runnable, Object param) {
+    public Task(String name, Callable<?> callable, Object param) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
         
-        if(runnable == null) {
-            throw new IllegalArgumentException("runnable is null");
+        if(callable == null) {
+            throw new IllegalArgumentException("callable is null");
         }
         
-        initialize(name, runnable, param, null);
+        initialize(name, callable, param, null);
     }
     
-    public Task(String name, Runnable runnable, Object param, Collection<String> nodeNames) {
+    public Task(String name, Callable<?> callable, Object param, Collection<String> nodeNames) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
         
-        initialize(name, runnable, param, nodeNames);
+        initialize(name, callable, param, nodeNames);
     }
     
-    private void initialize(String name, Runnable runnable, Object param, Collection<String> nodeNames) {
+    private void initialize(String name, Callable<?> callable, Object param, Collection<String> nodeNames) {
         this.name = name;
-        this.runnable = runnable;
+        this.callable = callable;
         this.param = param;
         
         if(nodeNames != null) {
@@ -131,16 +132,16 @@ public class Task {
         }
     }
     
-    public void setRunnable(Runnable runnable) {
-        if(runnable == null) {
-            throw new IllegalArgumentException("runnable is null");
+    public void setCallable(Callable<?> callable) {
+        if(callable == null) {
+            throw new IllegalArgumentException("callable is null");
         }
         
-        this.runnable = runnable;
+        this.callable = callable;
     }
     
-    public Runnable getRunnable() {
-        return this.runnable;
+    public Callable<?> getCallable() {
+        return this.callable;
     }
     
     public void setParam(Object param) {
@@ -155,7 +156,7 @@ public class Task {
         return this.param;
     }
     
-    public void setFuture(Future future) {
+    public void setFuture(Future<?> future) {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
@@ -163,7 +164,7 @@ public class Task {
         this.future = future;
     }
     
-    public Future<Object> getFuture() {
+    public Future<?> getFuture() {
         return this.future;
     }
     
