@@ -75,6 +75,22 @@ public class RecipeChunk {
         this.nodeIDs.addAll(that.nodeIDs);
     }
     
+    public RecipeChunk(long offset, int length, byte[] hash) {
+        if(offset < 0) {
+            throw new IllegalArgumentException("offset is invalid");
+        }
+        
+        if(length < 0) {
+            throw new IllegalArgumentException("length is invalid");
+        }
+        
+        if(hash == null) {
+            throw new IllegalArgumentException("hash is null");
+        }
+        
+        initialize(offset, length, hash, null);
+    }
+    
     public RecipeChunk(long offset, int length, byte[] hash, Collection<Integer> nodeIDs) {
         if(offset < 0) {
             throw new IllegalArgumentException("offset is invalid");
