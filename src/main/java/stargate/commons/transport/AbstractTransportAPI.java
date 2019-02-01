@@ -22,6 +22,7 @@ import java.util.Collection;
 import stargate.commons.cluster.Cluster;
 import stargate.commons.dataobject.DataObjectMetadata;
 import stargate.commons.dataobject.DataObjectURI;
+import stargate.commons.dataobject.Directory;
 import stargate.commons.recipe.Recipe;
 import stargate.commons.service.FSServiceInfo;
 
@@ -37,6 +38,7 @@ public abstract class AbstractTransportAPI {
     
     public abstract DataObjectMetadata getDataObjectMetadata(DataObjectURI uri) throws FileNotFoundException, IOException;
     public abstract Collection<DataObjectMetadata> listDataObjectMetadata(DataObjectURI uri) throws IOException;
+    public abstract Directory getDirectory(DataObjectURI uri) throws IOException;
     
     public abstract Recipe getRecipe(DataObjectURI uri) throws IOException;
     
