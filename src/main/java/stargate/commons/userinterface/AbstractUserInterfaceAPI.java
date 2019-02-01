@@ -15,6 +15,7 @@
 */
 package stargate.commons.userinterface;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -54,7 +55,7 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract void addDataExportEntry(DataExportEntry entry) throws IOException;
     public abstract void removeDataExportEntry(DataObjectURI uri) throws IOException;
     
-    public abstract DataObjectMetadata getDataObjectMetadata(DataObjectURI uri) throws IOException;
+    public abstract DataObjectMetadata getDataObjectMetadata(DataObjectURI uri) throws FileNotFoundException, IOException;
     public abstract Collection<DataObjectMetadata> listDataObjectMetadata(DataObjectURI uri) throws IOException;
     
     public abstract Collection<String> listRecipes() throws IOException;
