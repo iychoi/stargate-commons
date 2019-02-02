@@ -13,15 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.schedule;
-
-import java.io.IOException;
-import stargate.commons.driver.AbstractDriver;
+package stargate.commons.cluster;
 
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractScheduleDriver extends AbstractDriver {
-    public abstract void scheduleTask(DistributedTask task) throws IOException;
+public abstract class AbstractLocalClusterEventHandler {
+    public abstract void nodeJoined(String nodeName);
+    public abstract void nodeFailed(String nodeName);
+    public abstract void nodeLeft(String nodeName);
 }

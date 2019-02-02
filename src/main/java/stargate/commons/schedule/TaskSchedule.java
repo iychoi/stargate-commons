@@ -15,70 +15,91 @@
 */
 package stargate.commons.schedule;
 
-import java.util.Collection;
-import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import stargate.commons.utils.DateTimeUtils;
 
 /**
  *
  * @author iychoi
  */
-public class TaskSchedule extends Task {
+public class TaskSchedule {
     
     private static final Log LOG = LogFactory.getLog(TaskSchedule.class);
     
-    protected boolean repeat;
-    protected long delay; // in sec
-    protected long interval; // in sec
+    private String name;
+    private Runnable runnable;
+    private TimeUnit periodTimeUnit;
+    private long period;
+    private long lastPerformedTime = 0;
+    
     
     TaskSchedule() {
-        super();
+        this.name = null;
+        this.runnable = null;
+        this.periodTimeUnit = TimeUnit.MINUTES;
+        this.period = 0; // nowait
+        this.lastPerformedTime = 0;
+    }
+    
+    public TaskSchedule(String name, Runnable runnable, TimeUnit periodTimeUnit, long period) {
+        if(name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name is null or empty");
+        }
         
-        this.repeat = false;
-        this.delay = 0;
-        this.interval = 0;
-    }
-    
-    public TaskSchedule(String name, Callable callable, Object param, boolean repeat, long delay, long interval) {
-        super(name, callable, param);
+        if(runnable == null) {
+            throw new IllegalArgumentException("runnable is null");
+        }
         
-        initialize(repeat, delay, interval);
-    }
-    
-    public TaskSchedule(String name, Callable callable, Object param, Collection<String> nodeNames, boolean repeat, long delay, long interval) {
-        super(name, callable, param, nodeNames);
+        if(periodTimeUnit == null) {
+            throw new IllegalArgumentException("periodTimeUnit is null");
+        }
         
-        initialize(repeat, delay, interval);
+        if(period < 0) {
+            throw new IllegalArgumentException("period is invalid");
+        }
+        
+        initialize(name, runnable, periodTimeUnit, period);
     }
     
-    private void initialize(boolean repeat, long delay, long interval) {
-        this.repeat = repeat;
-        this.delay = Math.max(delay, 0);
-        this.interval = Math.max(0, interval);
+    private void initialize(String name, Runnable runnable, TimeUnit periodTimeUnit, long period) {
+        this.name = name;
+        this.runnable = runnable;
+        this.periodTimeUnit = periodTimeUnit;
+        this.period = period;
+        this.lastPerformedTime = 0;
     }
     
-    public void setRepeat(boolean repeat) {
-        this.repeat = repeat;
+    public String getName() {
+        return this.name;
     }
     
-    public boolean isRepeat() {
-        return this.repeat;
+    public Runnable getRunnable() {
+        return this.runnable;
     }
     
-    public void setDelay(long delay) {
-        this.delay = Math.max(delay, 0);
+    public TimeUnit getPeriodTimeUnit() {
+        return this.periodTimeUnit;
     }
     
-    public long getDelay() {
-        return this.delay;
+    public long getPeriod() {
+        return this.period;
     }
     
-    public void setInterval(long interval) {
-        this.interval = Math.max(0, interval);
+    public long getLastPerformedTime() {
+        return this.lastPerformedTime;
     }
     
-    public long getInterval() {
-        return this.interval;
+    public void updateLastPerformedTime() {
+        this.lastPerformedTime = DateTimeUtils.getTimestamp();
+    }
+    
+    public void setLastUpdateTime(long time) {
+        this.lastPerformedTime = time;
+    }
+    
+    public String toString() {
+        return String.format("TaskSchedule %s", this.name);
     }
 }

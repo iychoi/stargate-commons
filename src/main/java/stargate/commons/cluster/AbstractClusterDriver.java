@@ -31,4 +31,8 @@ public abstract class AbstractClusterDriver extends AbstractDriver {
     public abstract Cluster getLocalCluster() throws IOException;
     public abstract String getLeaderNodeName() throws IOException;
     public abstract boolean isLeaderNode() throws IOException;
+    
+    public abstract void addLocalClusterEventHandler(AbstractLocalClusterEventHandler eventHandler);
+    public abstract void removeLocalClusterEventHandler(AbstractLocalClusterEventHandler eventHandler);
+
 }

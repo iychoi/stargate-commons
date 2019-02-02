@@ -28,9 +28,9 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author iychoi
  */
-public class Task {
+public class DistributedTask {
     
-    private static final Log LOG = LogFactory.getLog(Task.class);
+    private static final Log LOG = LogFactory.getLog(DistributedTask.class);
     
     protected String name;
     protected Set<String> nodeNames = new HashSet<String>();
@@ -38,14 +38,14 @@ public class Task {
     protected Object param;
     protected Future<?> future;
     
-    Task() {
+    DistributedTask() {
         this.name = null;
         this.callable = null;
         this.param = null;
         this.future = null;
     }
     
-    public Task(String name, Object param) {
+    public DistributedTask(String name, Object param) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -53,7 +53,7 @@ public class Task {
         initialize(name, null, param, null);
     }
     
-    public Task(String name, Object param, Collection<String> nodeNames) {
+    public DistributedTask(String name, Object param, Collection<String> nodeNames) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -61,7 +61,7 @@ public class Task {
         initialize(name, null, param, nodeNames);
     }
     
-    public Task(String name, Callable<?> callable, Object param) {
+    public DistributedTask(String name, Callable<?> callable, Object param) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -73,7 +73,7 @@ public class Task {
         initialize(name, callable, param, null);
     }
     
-    public Task(String name, Callable<?> callable, Object param, Collection<String> nodeNames) {
+    public DistributedTask(String name, Callable<?> callable, Object param, Collection<String> nodeNames) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -169,6 +169,6 @@ public class Task {
     }
     
     public String toString() {
-        return String.format("Task %s", this.name);
+        return String.format("DistributedTask %s", this.name);
     }
 }
