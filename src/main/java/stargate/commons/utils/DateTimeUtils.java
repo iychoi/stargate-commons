@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -52,5 +53,9 @@ public class DateTimeUtils {
     public static String getDateTimeString(long timestamp) {
         LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), LOCAL_ZONEID);
         return time.format(FORMATTER);
+    }
+    
+    public static long getMilliseconds(TimeUnit timeunit, long value) {
+        return timeunit.toMillis(value);
     }
 }
