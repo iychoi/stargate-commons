@@ -38,6 +38,8 @@ public class Recipe {
     
     private static final Log LOG = LogFactory.getLog(Recipe.class);
     
+    public static final Integer NODE_ID_ALL_NODES = -1;
+    
     private DataObjectMetadata metadata;
     private String hashAlgorithm;
     private int chunkSize;
@@ -200,12 +202,16 @@ public class Recipe {
     public Collection<String> getNodeNames(Collection<Integer> nodeIDs) throws IOException {
         List<String> names = new ArrayList<String>();
         for(int id : nodeIDs) {
-            String name = this.nodeNames.get(id);
-            if(name == null || name.isEmpty()) {
-                throw new IOException(String.format("Cannot convert node id (%d) to name", id));
+            if(id == RecipeChunk.NODE_ID_ALL_NODES) {
+                names.addAll(this.nodeNames);
+                break;
+            } else {
+                String name = this.nodeNames.get(id);
+                if(name == null || name.isEmpty()) {
+                    throw new IOException(String.format("Cannot convert node id (%d) to name", id));
+                }
+                names.add(name);
             }
-            
-            names.add(name);
         }
         return Collections.unmodifiableCollection(names);
     }

@@ -37,7 +37,7 @@ public class RecipeChunk {
     
     private static final Log LOG = LogFactory.getLog(RecipeChunk.class);
     
-    public static final Integer NODE_ALL = -1;
+    public static final Integer NODE_ID_ALL_NODES = Recipe.NODE_ID_ALL_NODES;
     
     private long offset;
     private int length;
@@ -225,7 +225,7 @@ public class RecipeChunk {
     
     @JsonIgnore
     public boolean isAccessibleFromAllNode() {
-        return this.nodeIDs.contains(NODE_ALL);
+        return this.nodeIDs.contains(NODE_ID_ALL_NODES);
     }
     
     @JsonProperty("node_ids")
@@ -241,7 +241,7 @@ public class RecipeChunk {
     @JsonIgnore
     public void setAccessibleFromAllNode() {
         this.nodeIDs.clear();
-        this.nodeIDs.add(NODE_ALL);
+        this.nodeIDs.add(NODE_ID_ALL_NODES);
     }
     
     @JsonIgnore
