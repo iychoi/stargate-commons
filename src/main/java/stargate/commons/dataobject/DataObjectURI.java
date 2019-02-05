@@ -219,11 +219,16 @@ public class DataObjectURI implements Comparable {
     
     private URI createURI(String authority, String path) {
         try {
+            String newPath = path;
+            if(!path.startsWith("/")) {
+                newPath = "/" + path;
+            }
+            
             if(authority == null || authority.equals("")) {
-                URI uri = new URI(STARGATE_SCHEME, "", normalizePath(path), null, null);
+                URI uri = new URI(STARGATE_SCHEME, "", normalizePath(newPath), null, null);
                 return uri.normalize();
             } else {
-                URI uri = new URI(STARGATE_SCHEME, authority, normalizePath(path), null, null);
+                URI uri = new URI(STARGATE_SCHEME, authority, normalizePath(newPath), null, null);
                 return uri.normalize();
             }
         } catch (URISyntaxException e) {
