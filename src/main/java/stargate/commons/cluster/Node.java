@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -34,7 +35,6 @@ import stargate.commons.utils.IPUtils;
  * @author iychoi
  */
 public class Node {
-    
     private static final Log LOG = LogFactory.getLog(Node.class);
     
     private String name;
@@ -254,6 +254,37 @@ public class Node {
     @JsonIgnore
     public String toString() {
         return this.name + "(" + this.transportServiceInfo.toString() + ")";
+    }
+    
+    @Override
+    @JsonIgnore
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + Objects.hashCode(this.name);
+        hash = 73 * hash + Objects.hashCode(this.clusterName);
+        return hash;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Node other = (Node) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (!Objects.equals(this.clusterName, other.clusterName)) {
+            return false;
+        }
+        return true;
     }
     
     @JsonIgnore

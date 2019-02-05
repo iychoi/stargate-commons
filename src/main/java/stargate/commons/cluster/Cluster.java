@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -35,7 +36,7 @@ import stargate.commons.utils.DateTimeUtils;
  * @author iychoi
  */
 public class Cluster {
-    
+
     private static final Log LOG = LogFactory.getLog(Cluster.class);
     
     protected String name;
@@ -264,10 +265,37 @@ public class Cluster {
         this.lastUpdateTime = time;
     }
     
-    @JsonIgnore
     @Override
+    @JsonIgnore
     public String toString() {
         return this.name;
+    }
+    
+    @Override
+    @JsonIgnore
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Cluster other = (Cluster) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        return true;
     }
     
     @JsonIgnore
