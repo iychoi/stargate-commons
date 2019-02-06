@@ -153,7 +153,7 @@ public class Recipe {
         if(chunks != null) {
             for(RecipeChunk chunk : chunks) {
                 this.chunks.add(chunk);
-                this.chunkHashes.put(chunk.getHashString(), this.chunks.size() - 1);
+                this.chunkHashes.put(chunk.getHash(), this.chunks.size() - 1);
             }
         }
     }
@@ -275,7 +275,7 @@ public class Recipe {
         
         for(RecipeChunk chunk : chunks) {
             this.chunks.add(chunk);
-            this.chunkHashes.put(chunk.getHashString(), this.chunks.size() - 1);
+            this.chunkHashes.put(chunk.getHash(), this.chunks.size() - 1);
         }
     }
     
@@ -286,7 +286,7 @@ public class Recipe {
         }
         
         this.chunks.add(chunk);
-        this.chunkHashes.put(chunk.getHashString(), this.chunks.size() - 1);
+        this.chunkHashes.put(chunk.getHash(), this.chunks.size() - 1);
     }
     
     @JsonIgnore

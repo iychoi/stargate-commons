@@ -18,7 +18,6 @@ package stargate.commons.recipe;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +40,7 @@ public class RecipeChunk {
     
     private long offset;
     private int length;
-    private byte[] hash;
+    private String hash;
     // IDs of nodes that have the chunks
     // we can find names of the nodes from the Recipe instance.
     private List<Integer> nodeIDs = new ArrayList<Integer>();
@@ -63,9 +62,6 @@ public class RecipeChunk {
     }
     
     public RecipeChunk() {
-        this.offset = 0;
-        this.length = 0;
-        this.hash = null;
     }
     
     public RecipeChunk(RecipeChunk that) {
@@ -88,6 +84,23 @@ public class RecipeChunk {
             throw new IllegalArgumentException("hash is null");
         }
         
+        String hashString = HexUtils.toHexString(hash);
+        initialize(offset, length, hashString, null);
+    }
+    
+    public RecipeChunk(long offset, int length, String hash) {
+        if(offset < 0) {
+            throw new IllegalArgumentException("offset is invalid");
+        }
+        
+        if(length < 0) {
+            throw new IllegalArgumentException("length is invalid");
+        }
+        
+        if(hash == null || hash.isEmpty()) {
+            throw new IllegalArgumentException("hash is null or empty");
+        }
+        
         initialize(offset, length, hash, null);
     }
     
@@ -104,7 +117,8 @@ public class RecipeChunk {
             throw new IllegalArgumentException("hash is null");
         }
         
-        initialize(offset, length, hash, nodeIDs);
+        String hashString = HexUtils.toHexString(hash);
+        initialize(offset, length, hashString, nodeIDs);
     }
     
     public RecipeChunk(long offset, int length, String hash, Collection<Integer> nodeIDs) {
@@ -120,11 +134,10 @@ public class RecipeChunk {
             throw new IllegalArgumentException("hash is null or empty");
         }
         
-        byte[] hashbytes = HexUtils.toBytes(hash);
-        initialize(offset, length, hashbytes, nodeIDs);
+        initialize(offset, length, hash, nodeIDs);
     }
     
-    private void initialize(long offset, int length, byte[] hash, Collection<Integer> nodeIDs) {
+    private void initialize(long offset, int length, String hash, Collection<Integer> nodeIDs) {
         if(offset < 0) {
             throw new IllegalArgumentException("offset is invalid");
         }
@@ -133,13 +146,13 @@ public class RecipeChunk {
             throw new IllegalArgumentException("length is invalid");
         }
         
-        if(hash == null) {
-            throw new IllegalArgumentException("hash is null");
+        if(hash == null || hash.isEmpty()) {
+            throw new IllegalArgumentException("hash is null or empty");
         }
         
         this.offset = offset;
         this.length = length;
-        this.hash = hash;
+        this.hash = hash.toLowerCase();
         
         if(nodeIDs != null) {
             this.nodeIDs.addAll(nodeIDs);
@@ -166,56 +179,40 @@ public class RecipeChunk {
         this.length = len;
     }
 
-    @JsonIgnore
-    public byte[] getHash() {
+    @JsonProperty("hash")
+    public String getHash() {
         return this.hash;
     }
     
-    @JsonProperty("hash")
-    public String getHashString() {
+    @JsonIgnore
+    public byte[] getHashBytes() {
         if(this.hash == null) {
             return null;
         }
-        return HexUtils.toHexString(this.hash).toLowerCase();
+        return HexUtils.toBytes(this.hash);
     }
     
     @JsonIgnore
-    public void setHash(byte[] hash) {
-        this.hash = hash;
+    public void setHashBytes(byte[] hash) {
+        if(hash == null) {
+            this.hash = null;
+        } else {
+            this.hash = HexUtils.toHexString(hash).toLowerCase();
+        }
     }
     
     @JsonProperty("hash")
     public void setHash(String hash) {
-        if(hash == null) {
-            this.hash = null;
-        } else {
-            this.hash = HexUtils.toBytes(hash);
-        }
+        this.hash = hash.toLowerCase();
     }
 
     @JsonIgnore
-    public boolean hasHash(byte[] hash) {
+    public boolean hasHash(String hash) {
         if(this.hash == null) {
             return false;
         }
         
-        return Arrays.equals(this.hash, hash);
-        /*
-        if(this.hash.length == hash.length) {
-            for(int i=0;i<this.hash.length;i++) {
-                if(this.hash[i] != hash[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-        */
-    }
-    
-    @JsonIgnore
-    public boolean hasHash(String hash) {
-        return hasHash(HexUtils.toBytes(hash));
+        return this.hash.equalsIgnoreCase(hash);
     }
     
     @JsonProperty("node_ids")
@@ -251,7 +248,7 @@ public class RecipeChunk {
     
     @Override
     public String toString() {
-        return this.offset + ", " + this.length + ", " + HexUtils.toHexString(this.hash).toLowerCase();
+        return this.offset + ", " + this.length + ", " + this.hash;
     }
     
     @JsonIgnore
