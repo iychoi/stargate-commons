@@ -15,9 +15,11 @@
 */
 package stargate.commons.schedule;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -61,6 +63,17 @@ public class DistributedTask {
         initialize(name, null, param, nodeNames);
     }
     
+    public DistributedTask(String name, Object param, String nodeName) {
+        if(name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name is null or empty");
+        }
+        
+        List<String> nodeNames = new ArrayList<String>();
+        nodeNames.add(nodeName);
+        
+        initialize(name, null, param, nodeNames);
+    }
+    
     public DistributedTask(String name, Callable<?> callable, Object param) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
@@ -77,6 +90,17 @@ public class DistributedTask {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
+        
+        initialize(name, callable, param, nodeNames);
+    }
+    
+    public DistributedTask(String name, Callable<?> callable, Object param, String nodeName) {
+        if(name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name is null or empty");
+        }
+        
+        List<String> nodeNames = new ArrayList<String>();
+        nodeNames.add(nodeName);
         
         initialize(name, callable, param, nodeNames);
     }
