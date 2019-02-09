@@ -15,17 +15,12 @@
 */
 package stargate.commons.utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  *
  * @author iychoi
  */
 public class HexUtils {
 
-    private static final Log LOG = LogFactory.getLog(HexUtils.class);
-    
     public static String toHexString(byte[] arr) {
         StringBuilder sb = new StringBuilder();
         for (byte b : arr) {

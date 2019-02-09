@@ -17,8 +17,6 @@ package stargate.commons.service;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.config.AbstractImmutableConfig;
 import stargate.commons.manager.ManagerConfig;
@@ -30,8 +28,6 @@ import stargate.commons.utils.JsonSerializer;
  * @author iychoi
  */
 public class ServiceConfig extends AbstractImmutableConfig {
-    
-    private static final Log LOG = LogFactory.getLog(ServiceConfig.class);
     
     protected ManagerConfig clusterManagerConfig;
     protected ManagerConfig dataSourceManagerConfig;

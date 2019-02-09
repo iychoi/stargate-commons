@@ -58,6 +58,8 @@ public class RestfulClient {
             throw new IllegalArgumentException("serviceURL is null");
         }
         
+        // username and password can be null
+        
         this.serviceURL = serviceURL;
         
         SchemeRegistry registry = new SchemeRegistry();
@@ -198,7 +200,7 @@ public class RestfulClient {
     
     public Object post(String path, Object request) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = postAsync(path, request);
-        return processPost(future);
+        return processPostAsync(future);
     }
     
     public Future<ClientResponse> postAsync(String path, Object request) throws IOException {
@@ -217,7 +219,7 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").post(ClientResponse.class, request);
     }
     
-    public Object processPost(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
+    public Object processPostAsync(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
@@ -235,7 +237,7 @@ public class RestfulClient {
     
     public Object put(String path, Object request) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = putAsync(path, request);
-        return processPut(future);
+        return processPutAsync(future);
     }
     
     public Future<ClientResponse> putAsync(String path, Object request) throws IOException {
@@ -254,7 +256,7 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").put(ClientResponse.class, request);
     }
     
-    public Object processPut(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
+    public Object processPutAsync(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
@@ -272,7 +274,7 @@ public class RestfulClient {
     
     public Object get(String path) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = getAsync(path);
-        return processGet(future);
+        return processGetAsync(future);
     }
     
     public Future<ClientResponse> getAsync(String path) throws IOException {
@@ -286,7 +288,7 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").get(ClientResponse.class);
     }
     
-    public Object processGet(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
+    public Object processGetAsync(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
@@ -304,7 +306,7 @@ public class RestfulClient {
     
     public Object delete(String path) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = deleteAsync(path);
-        return processDelete(future);
+        return processDeleteAsync(future);
     }
     
     public Future<ClientResponse> deleteAsync(String path) throws IOException {
@@ -318,7 +320,7 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/json").type("application/json").delete(ClientResponse.class);
     }
     
-    public Object processDelete(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
+    public Object processDeleteAsync(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }
@@ -336,7 +338,7 @@ public class RestfulClient {
     
     public InputStream download(String path) throws IOException, FileNotFoundException, AuthenticationException {
         Future<ClientResponse> future = downloadAsync(path);
-        return processDownload(future);
+        return processDownloadAsync(future);
     }
     
     public Future<ClientResponse> downloadAsync(String path) throws IOException {
@@ -350,7 +352,7 @@ public class RestfulClient {
         return (Future<ClientResponse>) webResource.accept("application/octet-stream").type("application/json").get(ClientResponse.class);
     }
     
-    public InputStream processDownload(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
+    public InputStream processDownloadAsync(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {
         if(future == null) {
             throw new IllegalArgumentException("future is null");
         }

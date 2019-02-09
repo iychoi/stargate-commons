@@ -18,8 +18,6 @@ package stargate.commons.transport;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -30,8 +28,6 @@ import stargate.commons.utils.ClassUtils;
  * @author iychoi
  */
 public class TransportServiceInfo {
-    private static final Log LOG = LogFactory.getLog(TransportServiceInfo.class);
-    
     private String driverClass;
     private URI serviceUri;
     
@@ -51,12 +47,16 @@ public class TransportServiceInfo {
         return (TransportServiceInfo) JsonSerializer.fromJson(json, TransportServiceInfo.class);
     }
     
-    public TransportServiceInfo() {
+    TransportServiceInfo() {
     }
     
-    public TransportServiceInfo(TransportServiceInfo that) {
-        this.driverClass = that.driverClass;
-        this.serviceUri = that.serviceUri;
+    public TransportServiceInfo(TransportServiceInfo serviceInfo) {
+        if(serviceInfo == null) {
+            throw new IllegalArgumentException("serviceInfo is null");
+        }
+        
+        this.driverClass = serviceInfo.driverClass;
+        this.serviceUri = serviceInfo.serviceUri;
     }
     
     public TransportServiceInfo(String driverClass, URI connectionUri) {
@@ -66,18 +66,6 @@ public class TransportServiceInfo {
         
         if(connectionUri == null) {
             throw new IllegalArgumentException("connectionUri is null");
-        }
-        
-        initialize(driverClass, connectionUri);
-    }
-    
-    private void initialize(String driverClass, URI connectionUri) {
-        if(driverClass == null) {
-            throw new IllegalArgumentException("driverClass is null");
-        }
-        
-        if(connectionUri == null) {
-            throw new IllegalArgumentException("connectionUri is null or empty");
         }
         
         this.driverClass = driverClass;
@@ -119,6 +107,10 @@ public class TransportServiceInfo {
     
     @JsonProperty("service_uri")
     public void setServiceURI(URI serviceURI) {
+        if(serviceURI == null) {
+            throw new IllegalArgumentException("serviceURI is null");
+        }
+        
         this.serviceUri = serviceURI;
     }
     

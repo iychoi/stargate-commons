@@ -34,6 +34,10 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
     public abstract SourceFileMetadata getMetadata(URI uri) throws IOException, FileNotFoundException;
     
     public boolean exist(URI uri) throws IOException {
+        if(uri == null) {
+            throw new IllegalArgumentException("uri is null");
+        }
+        
         try {
             SourceFileMetadata metadata = getMetadata(uri);
             return metadata.exist();
@@ -43,20 +47,36 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
     }
     
     public boolean isDirectory(URI uri) throws IOException, FileNotFoundException {
+        if(uri == null) {
+            throw new IllegalArgumentException("uri is null");
+        }
+        
         SourceFileMetadata metadata = getMetadata(uri);
         return metadata.isDirectory();
     }
     
     public boolean isFile(URI uri) throws IOException, FileNotFoundException {
+        if(uri == null) {
+            throw new IllegalArgumentException("uri is null");
+        }
+        
         SourceFileMetadata metadata = getMetadata(uri);
         return metadata.isFile();
     }
     
     public long getFileSize(URI uri) throws IOException, FileNotFoundException {
+        if(uri == null) {
+            throw new IllegalArgumentException("uri is null");
+        }
+        
         SourceFileMetadata metadata = getMetadata(uri);
         return metadata.getFileSize();
     }
     public long getLastModifiedTime(URI uri) throws IOException, FileNotFoundException {
+        if(uri == null) {
+            throw new IllegalArgumentException("uri is null");
+        }
+        
         SourceFileMetadata metadata = getMetadata(uri);
         return metadata.getLastModifiedTime();
     }

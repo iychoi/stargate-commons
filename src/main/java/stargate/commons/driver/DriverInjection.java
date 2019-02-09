@@ -17,8 +17,6 @@ package stargate.commons.driver;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.config.AbstractImmutableConfig;
@@ -30,8 +28,6 @@ import stargate.commons.utils.ClassUtils;
  * @author iychoi
  */
 public class DriverInjection extends AbstractImmutableConfig {
-    
-    private static final Log LOG = LogFactory.getLog(DriverInjection.class);
     
     private Class driverClass;
     private AbstractDriverConfig driverConfig;

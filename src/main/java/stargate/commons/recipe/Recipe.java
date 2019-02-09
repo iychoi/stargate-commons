@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -36,8 +34,6 @@ import stargate.commons.utils.JsonSerializer;
  */
 public class Recipe {
     
-    private static final Log LOG = LogFactory.getLog(Recipe.class);
-    
     public static final Integer NODE_ID_ALL_NODES = -1;
     
     private DataObjectMetadata metadata;
@@ -45,7 +41,7 @@ public class Recipe {
     private int chunkSize;
     private List<String> nodeNames = new ArrayList<String>();
     private List<RecipeChunk> chunks = new ArrayList<RecipeChunk>(); // for order
-    private Map<String, Integer> chunkHashes = new HashMap<String, Integer>(); // for hash-idx conv
+    private Map<String, Integer> chunkHashes = new HashMap<String, Integer>(); // for hash-chunk idx conversion
 
     public static Recipe createInstance(File file) throws IOException {
         if(file == null) {
@@ -64,9 +60,6 @@ public class Recipe {
     }
     
     Recipe() {
-        this.metadata = null;
-        this.hashAlgorithm = null;
-        this.chunkSize = 0;
     }
     
     public Recipe(DataObjectMetadata metadata, String hashAlgorithm, int chunkSize) {
@@ -82,7 +75,9 @@ public class Recipe {
             throw new IllegalArgumentException("chunkSize is invalid");
         }
         
-        initialize(metadata, hashAlgorithm, chunkSize, null, null);
+        this.metadata = metadata;
+        this.hashAlgorithm = hashAlgorithm;
+        this.chunkSize = chunkSize;
     }
     
     public Recipe(DataObjectMetadata metadata, String hashAlgorithm, int chunkSize, Collection<String> nodeNames) {
@@ -102,10 +97,16 @@ public class Recipe {
             throw new IllegalArgumentException("nodeNames is null");
         }
         
-        initialize(metadata, hashAlgorithm, chunkSize, nodeNames, null);
+        this.metadata = metadata;
+        this.hashAlgorithm = hashAlgorithm;
+        this.chunkSize = chunkSize;
+        
+        if(nodeNames != null) {
+            this.nodeNames.addAll(nodeNames);
+        }
     }
     
-    public Recipe(DataObjectMetadata metadata, String hashAlgorithm, int chunkSize, Collection<String> nodeNames, Collection<RecipeChunk> chunk) {
+    public Recipe(DataObjectMetadata metadata, String hashAlgorithm, int chunkSize, Collection<String> nodeNames, Collection<RecipeChunk> chunks) {
         if(metadata == null) {
             throw new IllegalArgumentException("metadata is null");
         }
@@ -122,24 +123,8 @@ public class Recipe {
             throw new IllegalArgumentException("nodeNames is null");
         }
         
-        if(chunk == null) {
-            throw new IllegalArgumentException("chunk is null");
-        }
-        
-        initialize(metadata, hashAlgorithm, chunkSize, nodeNames, chunk);
-    }
-    
-    private void initialize(DataObjectMetadata metadata, String hashAlgorithm, int chunkSize, Collection<String> nodeNames, Collection<RecipeChunk> chunks) {
-        if(metadata == null) {
-            throw new IllegalArgumentException("metadata is null");
-        }
-        
-        if(hashAlgorithm == null || hashAlgorithm.isEmpty()) {
-            throw new IllegalArgumentException("hashAlgorithm is null or empty");
-        }
-        
-        if(chunkSize < 0) {
-            throw new IllegalArgumentException("chunkSize is invalid");
+        if(chunks == null) {
+            throw new IllegalArgumentException("chunks is null");
         }
         
         this.metadata = metadata;
@@ -165,6 +150,10 @@ public class Recipe {
     
     @JsonProperty("metadata")
     public void setMetadata(DataObjectMetadata metadata) {
+        if(metadata == null) {
+            throw new IllegalArgumentException("metadata is null");
+        }
+        
         this.metadata = metadata;
     }
     
@@ -175,7 +164,11 @@ public class Recipe {
     
     @JsonProperty("hash_algorithm")
     public void setHashAlgorithm(String hashAlgorithm) {
-        this.hashAlgorithm = hashAlgorithm;
+        if(hashAlgorithm == null || hashAlgorithm.isEmpty()) {
+            throw new IllegalArgumentException("hashAlgorithm is null");
+        }
+        
+        this.hashAlgorithm = hashAlgorithm.trim();
     }
     
     @JsonProperty("chunk_size")
@@ -185,6 +178,10 @@ public class Recipe {
     
     @JsonProperty("chunk_size")
     public void setChunkSize(int chunkSize) {
+        if(chunkSize < 0) {
+            throw new IllegalArgumentException("chunkSize is negative");
+        }
+        
         this.chunkSize = chunkSize;
     }
     
@@ -200,6 +197,10 @@ public class Recipe {
     
     @JsonIgnore
     public Collection<String> getNodeNames(Collection<Integer> nodeIDs) throws IOException {
+        if(nodeIDs == null || nodeIDs.isEmpty()) {
+            throw new IllegalArgumentException("nodeIDs is null or empty");
+        }
+        
         List<String> names = new ArrayList<String>();
         for(int id : nodeIDs) {
             if(id == RecipeChunk.NODE_ID_ALL_NODES) {
@@ -218,21 +219,37 @@ public class Recipe {
     
     @JsonIgnore
     public synchronized int getNodeID(String nodeName) {
+        if(nodeName == null || nodeName.isEmpty()) {
+            throw new IllegalArgumentException("nodeName is null or empty");
+        }
+        
         return this.nodeNames.indexOf(nodeName);
     }
     
     @JsonProperty("node_names")
     public synchronized void addNodeNames(Collection<String> nodeNames) {
+        if(nodeNames == null) {
+            throw new IllegalArgumentException("nodeNames is null");
+        }
+        
         this.nodeNames.addAll(nodeNames);
     }
     
     @JsonIgnore
     public synchronized void addNodeName(String nodeName) {
+        if(nodeName == null || nodeName.isEmpty()) {
+            throw new IllegalArgumentException("nodeName is null or empty");
+        }
+        
         this.nodeNames.add(nodeName);
     }
     
     @JsonIgnore
     public synchronized int addNodeNameAndReturnID(String nodeName) {
+        if(nodeName == null || nodeName.isEmpty()) {
+            throw new IllegalArgumentException("nodeName is null or empty");
+        }
+        
         this.nodeNames.add(nodeName);
         return this.nodeNames.size() - 1;
     }
@@ -249,7 +266,11 @@ public class Recipe {
     
     @JsonIgnore
     public synchronized RecipeChunk getChunk(String hash) {
-        Integer idx = this.chunkHashes.get(hash);
+        if(hash == null || hash.isEmpty()) {
+            throw new IllegalArgumentException("hash is null or empty");
+        }
+        
+        Integer idx = this.chunkHashes.get(hash.trim().toLowerCase());
         if(idx == null) {
             return null;
         }
@@ -257,14 +278,32 @@ public class Recipe {
     }
     
     @JsonIgnore
-    public synchronized RecipeChunk getChunk(long offset) {
+    public synchronized RecipeChunk getChunk(long offset) throws IOException {
+        if(offset < 0) {
+            throw new IllegalArgumentException("offset is negative");
+        }
+        
+        if(this.chunkSize != 0) {
+            int idx = (int) (offset / this.chunkSize);
+            if(this.chunks.size() > idx) {
+                RecipeChunk chunk = this.chunks.get(idx);
+                if(chunk.getOffset() <= offset &&
+                    chunk.getOffset() + chunk.getLength() > offset) {
+                    return chunk;
+                }
+            }
+        }
+            
+        // if chunks are not in order, so we could not find the chunk, 
+        // iterate through all chunks
         for(RecipeChunk chunk : this.chunks) {
             if(chunk.getOffset() <= offset &&
                     chunk.getOffset() + chunk.getLength() > offset) {
                 return chunk;
             }
         }
-        return null;
+        
+        throw new IOException(String.format("Cound not find a chunk for an offset : %d", offset));
     }
     
     @JsonProperty("chunks")
@@ -296,6 +335,7 @@ public class Recipe {
     }
     
     @Override
+    @JsonIgnore
     public String toString() {
         return this.metadata.toString() + ", " + this.hashAlgorithm;
     }

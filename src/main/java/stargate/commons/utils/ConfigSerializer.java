@@ -30,7 +30,11 @@ public class ConfigSerializer {
     }
     
     public Map<String, Object> toMap(Object obj) throws IOException {
-        Map kv = new HashMap<String, Object>();
+        if(obj == null) {
+            throw new IllegalArgumentException("obj is null");
+        }
+        
+        Map<String, Object> kv = new HashMap<String, Object>();
         
         Class<?> clazz = obj.getClass();
         for(Field field : clazz.getFields()) {
@@ -58,6 +62,10 @@ public class ConfigSerializer {
     public Object fromMap(Map<String, Object> map, Class<?> clazz) throws IOException {
         if(map == null) {
             return null;
+        }
+        
+        if(clazz == null) {
+            throw new IllegalArgumentException("clazz is null");
         }
         
         try {

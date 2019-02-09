@@ -35,27 +35,55 @@ public class DateTimeUtils {
         return Instant.now().toEpochMilli();
     }
     
-    public static boolean timeElapsedSec(long prev_time, long cur_time, long threshold_time_sec) {
-        return timeElapsed(prev_time, cur_time, threshold_time_sec * 1000);
+    public static boolean timeElapsedSec(long prev_time, long cur_time, long expiration_time) {
+        return timeElapsed(prev_time, cur_time, expiration_time * 1000);
     }
     
-    public static boolean timeElapsed(long prev_time, long cur_time, long threshold_time) {
-        if(cur_time - prev_time >= threshold_time) {
+    public static boolean timeElapsed(long prev_time, long cur_time, long expiration_time) {
+        if(prev_time < 0) {
+            throw new IllegalArgumentException("prev_time is negative");
+        }
+        
+        if(cur_time < 0) {
+            throw new IllegalArgumentException("cur_time is negative");
+        }
+        
+        if(expiration_time < 0) {
+            throw new IllegalArgumentException("expiration_time is negative");
+        }
+        
+        if(cur_time - prev_time >= expiration_time) {
             return true;
         }
         return false;
     }
     
     public static LocalDateTime getDateTime(long timestamp) {
+        if(timestamp < 0) {
+            throw new IllegalArgumentException("timestamp is negative");
+        }
+        
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), LOCAL_ZONEID);
     }
     
     public static String getDateTimeString(long timestamp) {
+        if(timestamp < 0) {
+            throw new IllegalArgumentException("timestamp is negative");
+        }
+        
         LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), LOCAL_ZONEID);
         return time.format(FORMATTER);
     }
     
     public static long getMilliseconds(TimeUnit timeunit, long value) {
+        if(timeunit == null) {
+            throw new IllegalArgumentException("timeunit is null");
+        }
+        
+        if(value < 0) {
+            throw new IllegalArgumentException("value is negative");
+        }
+        
         return timeunit.toMillis(value);
     }
 }

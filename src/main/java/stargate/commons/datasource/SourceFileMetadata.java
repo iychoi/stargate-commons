@@ -18,8 +18,6 @@ package stargate.commons.datasource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -29,8 +27,6 @@ import stargate.commons.utils.JsonSerializer;
  * @author iychoi
  */
 public class SourceFileMetadata {
-    private static final Log LOG = LogFactory.getLog(SourceFileMetadata.class);
-    
     private URI uri;
     private boolean exist;
     private boolean directory;
@@ -54,11 +50,6 @@ public class SourceFileMetadata {
     }
     
     SourceFileMetadata() {
-        this.uri = null;
-        this.exist = false;
-        this.directory = false;
-        this.fileSize = 0;
-        this.lastModifiedTime = 0;
     }
     
     public SourceFileMetadata(URI uri, boolean exist, boolean directory, long fileSize, long lastModifiedTime) {
@@ -74,10 +65,6 @@ public class SourceFileMetadata {
             throw new IllegalArgumentException("lastModifiedTime cannot be a negative number");
         }
         
-        initialize(uri, exist, directory, fileSize, lastModifiedTime);
-    }
-    
-    private void initialize(URI uri, boolean exist, boolean directory, long fileSize, long lastModifiedTime) {
         this.uri = uri;
         this.exist = exist;
         this.directory = directory;

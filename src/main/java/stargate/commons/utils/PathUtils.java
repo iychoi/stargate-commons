@@ -28,10 +28,18 @@ import java.util.List;
  */
 public class PathUtils {
     public static String getFileName(URI path) {
+        if(path == null) {
+            throw new IllegalArgumentException("path is null");
+        }
+        
         return getFileName(path.getPath());
     }
     
     public static String getFileName(String path) {
+        if(path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("path is null or empty");
+        }
+        
         int idx = path.lastIndexOf("/");
         String filename = path;
         if(idx >= 0) {
@@ -45,10 +53,18 @@ public class PathUtils {
     }
     
     public static String getFileExtension(URI path) {
+        if(path == null) {
+            throw new IllegalArgumentException("path is null");
+        }
+        
         return getFileExtension(path.getPath());
     }
     
     public static String getFileExtension(String path) {
+        if(path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("path is null or empty");
+        }
+        
         String filename = getFileName(path);
         int idx = filename.lastIndexOf(".");
         if(idx >= 0) {
@@ -62,10 +78,18 @@ public class PathUtils {
     }
     
     public static String getParent(URI path) {
+        if(path == null) {
+            throw new IllegalArgumentException("path is null");
+        }
+        
         return getParent(path.normalize().getPath());
     }
     
     public static String getParent(String path) {
+        if(path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("path is null or empty");
+        }
+        
         // check root
         if(path.equals("/")) {
             return null;
@@ -80,6 +104,10 @@ public class PathUtils {
     }
     
     public static Collection<String> getParents(String path) {
+        if(path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("path is null or empty");
+        }
+        
         // check root
         if(path.equals("/")) {
             return null;
@@ -110,6 +138,8 @@ public class PathUtils {
     }
     
     public static String concatPath(String path1, String path2) {
+        // path1 and path2 can be null
+        
         StringBuilder sb = new StringBuilder();
         sb.append("/");
         
@@ -131,6 +161,23 @@ public class PathUtils {
             } else {
                 sb.append(path2);
             }
+        }
+        
+        return sb.toString();
+    }
+    
+    public static String makeAbsolutePath(String path) {
+        if(path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("path is null or empty");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        if(path.startsWith("/")) {
+            sb.append(path);
+        } else {
+            sb.append("/");
+            sb.append(path);
         }
         
         return sb.toString();

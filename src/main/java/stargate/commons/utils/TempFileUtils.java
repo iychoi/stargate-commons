@@ -30,6 +30,10 @@ public class TempFileUtils {
     }
     
     public static File createTempFile(String name) throws IOException {
+        if(name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name is null or empty");
+        }
+        
         File f = new File(getTempRoot(), name);
         f.createNewFile();
         f.deleteOnExit();
@@ -37,12 +41,18 @@ public class TempFileUtils {
     }
     
     public static File createTempFile(String prefix, String extension) throws IOException {
+        // prefix and extension can be null
+        
         File f = File.createTempFile(prefix, extension, getTempRoot());
         f.deleteOnExit();
         return f;
     }
     
     public static File createTempDir(String name) {
+        if(name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name is null or empty");
+        }
+        
         File f = new File(getTempRoot(), name);
         f.deleteOnExit();
         f.mkdirs();

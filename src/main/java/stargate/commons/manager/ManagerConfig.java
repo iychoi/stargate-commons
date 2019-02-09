@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.config.AbstractImmutableConfig;
@@ -37,8 +35,6 @@ import stargate.commons.driver.DriverInjection;
  * @author iychoi
  */
 public class ManagerConfig extends AbstractImmutableConfig {
-    
-    private static final Log LOG = LogFactory.getLog(ManagerConfig.class);
     
     private List<DriverInjection> driverSettings = new ArrayList<DriverInjection>();
     

@@ -22,30 +22,38 @@ import java.io.File;
  * @author iychoi
  */
 public class DirUtils {
-    public static boolean makeDir(File f) {
-        if(!f.exists()) {
-            return f.mkdirs();
+    public static boolean makeDir(File file) {
+        if(file == null) {
+            throw new IllegalArgumentException("file is null");
+        }
+        
+        if(!file.exists()) {
+            return file.mkdirs();
         } else {
             return true;
         }
     }
     
-    public static void clearDir(File f) {
-        if(f.exists()) {
-            File[] files = f.listFiles();
-            for(File file : files) {
-                removeRecursively(file);
+    public static void clearDir(File file) {
+        if(file == null) {
+            throw new IllegalArgumentException("file is null");
+        }
+        
+        if(file.exists()) {
+            File[] files = file.listFiles();
+            for(File f : files) {
+                removeRecursively(f);
             }
         }
     }
     
-    private static void removeRecursively(File f) {
-        if(f.isFile()) {
-            f.delete();
-        } else if(f.isDirectory()) {
-            File[] files = f.listFiles();
-            for(File file : files) {
-                removeRecursively(file);
+    private static void removeRecursively(File file) {
+        if(file.isFile()) {
+            file.delete();
+        } else if(file.isDirectory()) {
+            File[] files = file.listFiles();
+            for(File f : files) {
+                removeRecursively(f);
             }
         }
     }

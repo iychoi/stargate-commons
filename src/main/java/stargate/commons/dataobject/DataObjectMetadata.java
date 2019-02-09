@@ -17,8 +17,6 @@ package stargate.commons.dataobject;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -28,8 +26,6 @@ import stargate.commons.utils.JsonSerializer;
  * @author iychoi
  */
 public class DataObjectMetadata {
-    
-    private static final Log LOG = LogFactory.getLog(DataObjectMetadata.class);
     
     private DataObjectURI uri;
     private long size;
@@ -72,26 +68,13 @@ public class DataObjectMetadata {
             throw new IllegalArgumentException("lastModifiedTime is invalid");
         }
         
-        initialize(uri, size, false, lastModifiedTime);
+        this.uri = uri;
+        this.size = size;
+        this.directory = false;
+        this.lastModifiedTime = lastModifiedTime;
     }
     
     public DataObjectMetadata(DataObjectURI uri, long size, boolean directory, long lastModifiedTime) {
-        if(uri == null) {
-            throw new IllegalArgumentException("uri is null");
-        }
-        
-        if(size < 0) {
-            throw new IllegalArgumentException("size is invalid");
-        }
-        
-        if(lastModifiedTime < 0) {
-            throw new IllegalArgumentException("lastModifiedTime is invalid");
-        }
-        
-        initialize(uri, size, directory, lastModifiedTime);
-    }
-    
-    private void initialize(DataObjectURI uri, long size, boolean directory, long lastModifiedTime) {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }

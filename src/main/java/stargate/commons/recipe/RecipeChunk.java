@@ -17,12 +17,10 @@ package stargate.commons.recipe;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.HashSet;
+import java.util.Set;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -34,8 +32,6 @@ import stargate.commons.utils.HexUtils;
  */
 public class RecipeChunk {
     
-    private static final Log LOG = LogFactory.getLog(RecipeChunk.class);
-    
     public static final Integer NODE_ID_ALL_NODES = Recipe.NODE_ID_ALL_NODES;
     
     private long offset;
@@ -43,7 +39,7 @@ public class RecipeChunk {
     private String hash;
     // IDs of nodes that have the chunks
     // we can find names of the nodes from the Recipe instance.
-    private List<Integer> nodeIDs = new ArrayList<Integer>();
+    private Set<Integer> nodeIDs = new HashSet<Integer>();
     
     public static RecipeChunk createInstance(File file) throws IOException {
         if(file == null) {
@@ -64,11 +60,12 @@ public class RecipeChunk {
     public RecipeChunk() {
     }
     
-    public RecipeChunk(RecipeChunk that) {
-        this.offset = that.offset;
-        this.length = that.length;
-        this.hash = that.hash;
-        this.nodeIDs.addAll(that.nodeIDs);
+    public RecipeChunk(RecipeChunk chunk) {
+        if(chunk == null) {
+            throw new IllegalArgumentException("chunk is null");
+        }
+        
+        initialize(chunk.offset, chunk.length, chunk.hash, chunk.nodeIDs);
     }
     
     public RecipeChunk(long offset, int length, byte[] hash) {
@@ -138,18 +135,6 @@ public class RecipeChunk {
     }
     
     private void initialize(long offset, int length, String hash, Collection<Integer> nodeIDs) {
-        if(offset < 0) {
-            throw new IllegalArgumentException("offset is invalid");
-        }
-        
-        if(length < 0) {
-            throw new IllegalArgumentException("length is invalid");
-        }
-        
-        if(hash == null || hash.isEmpty()) {
-            throw new IllegalArgumentException("hash is null or empty");
-        }
-        
         this.offset = offset;
         this.length = length;
         this.hash = hash.toLowerCase();
@@ -166,6 +151,10 @@ public class RecipeChunk {
     
     @JsonProperty("offset")
     public void setOffset(long offset) {
+        if(offset < 0) {
+            throw new IllegalArgumentException("offset is negative");
+        }
+        
         this.offset = offset;
     }
     
@@ -176,6 +165,10 @@ public class RecipeChunk {
     
     @JsonProperty("length")
     public void setLength(int len) {
+        if(len < 0) {
+            throw new IllegalArgumentException("len is negative");
+        }
+        
         this.length = len;
     }
 
@@ -203,16 +196,20 @@ public class RecipeChunk {
     
     @JsonProperty("hash")
     public void setHash(String hash) {
-        this.hash = hash.toLowerCase();
+        if(hash == null || hash.isEmpty()) {
+            throw new IllegalArgumentException("hash is null or empty");
+        }
+        
+        this.hash = hash.trim().toLowerCase();
     }
 
     @JsonIgnore
     public boolean hasHash(String hash) {
-        if(this.hash == null) {
-            return false;
+        if(hash == null || hash.isEmpty()) {
+            throw new IllegalArgumentException("hash is null or empty");
         }
         
-        return this.hash.equalsIgnoreCase(hash);
+        return this.hash.equalsIgnoreCase(hash.trim());
     }
     
     @JsonProperty("node_ids")
@@ -227,11 +224,21 @@ public class RecipeChunk {
     
     @JsonProperty("node_ids")
     public void addNodeIDs(Collection<Integer> nodeIDs) {
-        this.nodeIDs.addAll(nodeIDs);
+        if(nodeIDs == null) {
+            throw new IllegalArgumentException("nodeIDs is null");
+        }
+        
+        for(int nodeID : nodeIDs) {
+            addNodeID(nodeID);
+        }
     }
     
     @JsonIgnore
     public void addNodeID(int nodeID) {
+        if(nodeID < 0 && nodeID != NODE_ID_ALL_NODES) {
+            throw new IllegalArgumentException("nodeID is negative");
+        }
+        
         this.nodeIDs.add(nodeID);
     }
     
@@ -247,6 +254,7 @@ public class RecipeChunk {
     }
     
     @Override
+    @JsonIgnore
     public String toString() {
         return this.offset + ", " + this.length + ", " + this.hash;
     }

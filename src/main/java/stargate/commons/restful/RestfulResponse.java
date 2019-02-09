@@ -18,8 +18,6 @@ package stargate.commons.restful;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.ClassUtils;
@@ -31,13 +29,11 @@ import stargate.commons.utils.JsonSerializer;
  */
 public class RestfulResponse {
     
-    private static final Log LOG = LogFactory.getLog(RestfulResponse.class);
-    
     private Class responseClass;
     private String responseJson;
     private boolean exception;
     
-    public RestfulResponse() {   
+    RestfulResponse() {   
     }
     
     public RestfulResponse(Object response) throws IOException {
@@ -110,6 +106,8 @@ public class RestfulResponse {
     
     @JsonProperty("response")
     public void setResponseJson(String json) throws IOException {
+        // json can be null
+        
         this.responseJson = json;
     }
     

@@ -23,16 +23,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
  * @author iychoi
  */
 public class DistributedTask {
-    
-    private static final Log LOG = LogFactory.getLog(DistributedTask.class);
     
     protected String name;
     protected Set<String> nodeNames = new HashSet<String>();
@@ -41,16 +37,14 @@ public class DistributedTask {
     protected Future<?> future;
     
     DistributedTask() {
-        this.name = null;
-        this.callable = null;
-        this.param = null;
-        this.future = null;
     }
     
     public DistributedTask(String name, Object param) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
+        
+        // param can be null
         
         initialize(name, null, param, null);
     }
@@ -60,6 +54,12 @@ public class DistributedTask {
             throw new IllegalArgumentException("name is null or empty");
         }
         
+        if(nodeNames == null) {
+            throw new IllegalArgumentException("nodeNames is null");
+        }
+        
+        // param can be null
+        
         initialize(name, null, param, nodeNames);
     }
     
@@ -67,6 +67,12 @@ public class DistributedTask {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
+        
+        if(nodeName == null || nodeName.isEmpty()) {
+            throw new IllegalArgumentException("nodeName is null or empty");
+        }
+        
+        // param can be null
         
         List<String> nodeNames = new ArrayList<String>();
         nodeNames.add(nodeName);
@@ -83,6 +89,8 @@ public class DistributedTask {
             throw new IllegalArgumentException("callable is null");
         }
         
+        // param can be null
+        
         initialize(name, callable, param, null);
     }
     
@@ -91,6 +99,16 @@ public class DistributedTask {
             throw new IllegalArgumentException("name is null or empty");
         }
         
+        if(callable == null) {
+            throw new IllegalArgumentException("callable is null");
+        }
+        
+        if(nodeNames == null) {
+            throw new IllegalArgumentException("nodeNames is null");
+        }
+        
+        // param can be null
+        
         initialize(name, callable, param, nodeNames);
     }
     
@@ -98,6 +116,16 @@ public class DistributedTask {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
+        
+        if(callable == null) {
+            throw new IllegalArgumentException("callable is null");
+        }
+        
+        if(nodeName == null || nodeName.isEmpty()) {
+            throw new IllegalArgumentException("nodeName is null or empty");
+        }
+        
+        // param can be null
         
         List<String> nodeNames = new ArrayList<String>();
         nodeNames.add(nodeName);
@@ -113,7 +141,9 @@ public class DistributedTask {
         if(nodeNames != null) {
             for(String nodeName : nodeNames) {
                 // if it already exists, skip
-                this.nodeNames.add(nodeName);
+                if(nodeName != null && !nodeName.isEmpty()) {
+                    this.nodeNames.add(nodeName);
+                }
             }
         }
     }
@@ -140,7 +170,8 @@ public class DistributedTask {
         }
         
         for(String nodeName : nodeNames) {
-            if(!this.nodeNames.contains(nodeName)) {
+            // if it already exists, skip
+            if(nodeName != null && !nodeName.isEmpty()) {
                 this.nodeNames.add(nodeName);
             }
         }
@@ -151,9 +182,7 @@ public class DistributedTask {
             throw new IllegalArgumentException("nodeName is null or empty");
         }
         
-        if(!this.nodeNames.contains(nodeName)) {
-            this.nodeNames.add(nodeName);
-        }
+        this.nodeNames.add(nodeName);
     }
     
     public void setCallable(Callable<?> callable) {
@@ -169,9 +198,7 @@ public class DistributedTask {
     }
     
     public void setParam(Object param) {
-        if(param == null) {
-            throw new IllegalArgumentException("param is null");
-        }
+        // param can be null
         
         this.param = param;
     }

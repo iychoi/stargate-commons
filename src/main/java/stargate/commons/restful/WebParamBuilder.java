@@ -17,6 +17,7 @@ package stargate.commons.restful;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,34 +30,38 @@ public class WebParamBuilder {
     private String resourceURL;
     private Map<String, String> params = new LinkedHashMap<String, String>();
     
-    public WebParamBuilder(String contentURL) {
-        this.resourceURL = contentURL;
+    public WebParamBuilder(String resourceURL) {
+        this.resourceURL = resourceURL;
     }
     
     public void addParam(String key) {
-        this.params.put(key, null);
+        this.params.put(key.trim(), null);
     }
     
     public void addParam(String key, String value) throws UnsupportedEncodingException {
         if(value != null) {
             String escapedValue = URLEncoder.encode(value, "UTF-8");
-            this.params.put(key, escapedValue);
+            this.params.put(key.trim(), escapedValue);
         } else {
             // no value
-            this.params.put(key, null);
+            this.params.put(key.trim(), null);
         }
     }
     
     public void addParam(String key, int value) {
-        this.params.put(key, Integer.toString(value));
+        this.params.put(key.trim(), Integer.toString(value));
     }
     
     public void addParam(String key, long value) {
-        this.params.put(key, Long.toString(value));
+        this.params.put(key.trim(), Long.toString(value));
     }
     
     public void removeParam(String key) {
-        this.params.remove(key);
+        this.params.remove(key.trim());
+    }
+    
+    public Map getParams() {
+        return Collections.unmodifiableMap(this.params);
     }
     
     public String build() {

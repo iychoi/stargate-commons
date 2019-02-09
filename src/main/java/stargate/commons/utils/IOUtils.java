@@ -35,6 +35,10 @@ public class IOUtils {
     }
     
     public static byte[] read(InputStream is) throws IOException {
+        if(is == null) {
+            throw new IllegalArgumentException("is is null");
+        }
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BufferedInputStream bis = new BufferedInputStream(is);
         
@@ -48,26 +52,37 @@ public class IOUtils {
         return baos.toByteArray();
     }
     
-    public static void write(OutputStream os, byte[] bytes) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(os);
-        bos.write(bytes);
-    }
-    
     public static void writeString(OutputStream os, String json) throws IOException {
         write(os, json.getBytes());
     }
     
-    public static byte[] toByteArray(final InputStream input) throws IOException {
+    public static void write(OutputStream os, byte[] bytes) throws IOException {
+        if(os == null) {
+            throw new IllegalArgumentException("os is null");
+        }
+        
+        if(bytes == null) {
+            throw new IllegalArgumentException("bytes is null");
+        }
+        
+        BufferedOutputStream bos = new BufferedOutputStream(os);
+        bos.write(bytes);
+    }
+    
+    public static byte[] toByteArray(final InputStream is) throws IOException {
+        if(is == null) {
+            throw new IllegalArgumentException("is is null");
+        }
+        
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         
         byte[] buffer = new byte[BUFFER_SIZE];
-        long count = 0;
         int read;
-        while ((read = input.read(buffer)) > 0) {
+        while ((read = is.read(buffer)) > 0) {
             output.write(buffer, 0, read);
-            count += read;
         }
         
+        output.close();
         return output.toByteArray();
     }
 }

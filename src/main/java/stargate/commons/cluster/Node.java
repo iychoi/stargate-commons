@@ -61,11 +61,6 @@ public class Node {
     }
     
     Node() {
-        this.name = null;
-        this.clusterName = null;
-        this.status = null;
-        this.transportServiceInfo = null;
-        this.userInterfaceServiceInfo = null;
     }
     
     public Node(String name, String clusterName, NodeStatus status, TransportServiceInfo transportServiceInfo, UserInterfaceServiceInfo userInterfaceServiceInfo) {

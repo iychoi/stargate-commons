@@ -17,8 +17,6 @@ package stargate.commons.service;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -29,8 +27,6 @@ import stargate.commons.utils.JsonSerializer;
  * @author iychoi
  */
 public class FSServiceInfo {
-    
-    private static final Log LOG = LogFactory.getLog(FSServiceInfo.class);
     
     private int chunkSize;
     private String hashAlgorithm;
@@ -51,23 +47,18 @@ public class FSServiceInfo {
         return (FSServiceInfo) JsonSerializer.fromJson(json, FSServiceInfo.class);
     }
     
-    public FSServiceInfo() {
-        this.chunkSize = 0;
-        this.hashAlgorithm = null;
+    FSServiceInfo() {
     }
     
     public FSServiceInfo(int chunkSize, String hashAlgorithm) {
         if(chunkSize < 0) {
-            throw new IllegalArgumentException("chunkSize must not be negative");
+            throw new IllegalArgumentException("chunkSize is negative");
         }
         
         if(hashAlgorithm == null || hashAlgorithm.isEmpty()) {
             throw new IllegalArgumentException("hashAlgorithm is null or empty");
         }
-        initialize(chunkSize, hashAlgorithm);
-    }
-    
-    private void initialize(int chunkSize, String hashAlgorithm) {
+        
         this.chunkSize = chunkSize;
         this.hashAlgorithm = hashAlgorithm;
     }

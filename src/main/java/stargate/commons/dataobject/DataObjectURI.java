@@ -17,8 +17,6 @@ package stargate.commons.dataobject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -32,8 +30,6 @@ public class DataObjectURI implements Comparable {
     DataObjectURI consists of 
      - sgfs://<CLUSTER_ID>/path/to/resource
     */
-    private static final Log LOG = LogFactory.getLog(DataObjectURI.class);
-    
     public static final String STARGATE_SCHEME = "sgfs";
     public static final String WILDCARD_LOCAL_CLUSTER_NAME = "local";
 
@@ -112,7 +108,7 @@ public class DataObjectURI implements Comparable {
     
     private void initialize(String uri) {
         if (uri == null) {
-            throw new IllegalArgumentException("uri is null or empty");
+            throw new IllegalArgumentException("uri is null");
         }
         
         String scheme = null;

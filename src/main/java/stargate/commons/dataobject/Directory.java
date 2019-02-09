@@ -17,12 +17,10 @@ package stargate.commons.dataobject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.HashSet;
+import java.util.Set;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -33,11 +31,9 @@ import stargate.commons.utils.JsonSerializer;
  */
 public class Directory {
     
-    private static final Log LOG = LogFactory.getLog(Directory.class);
-    
     private DataObjectURI uri;
     private long lastModifiedTime;
-    private List<DataObjectMetadata> entries = new ArrayList<DataObjectMetadata>();
+    private Set<DataObjectMetadata> entries = new HashSet<DataObjectMetadata>();
     
     public static final long DIRECTORY_METADATA_SIZE = 4*1024;
     
@@ -58,8 +54,6 @@ public class Directory {
     }
     
     Directory() {
-        this.uri = null;
-        this.lastModifiedTime = 0;
     }
     
     public Directory(DataObjectURI uri, long lastModifiedTime) {
@@ -71,22 +65,11 @@ public class Directory {
             throw new IllegalArgumentException("lastModifiedTime is invalid");
         }
         
-        initialize(uri, lastModifiedTime, null);
+        this.uri = uri;
+        this.lastModifiedTime = lastModifiedTime;
     }
     
     public Directory(DataObjectURI uri, long lastModifiedTime, Collection<DataObjectMetadata> entries) {
-        if(uri == null) {
-            throw new IllegalArgumentException("uri is null");
-        }
-        
-        if(lastModifiedTime < 0) {
-            throw new IllegalArgumentException("lastModifiedTime is invalid");
-        }
-        
-        initialize(uri, lastModifiedTime, entries);
-    }
-    
-    private void initialize(DataObjectURI uri, long lastModifiedTime, Collection<DataObjectMetadata> entries) {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
@@ -165,9 +148,7 @@ public class Directory {
             throw new IllegalArgumentException("entry is null or empty");
         }
         
-        if(!this.entries.contains(entry)) {
-            this.entries.add(entry);
-        }
+        this.entries.add(entry);
     }
     
     @JsonIgnore

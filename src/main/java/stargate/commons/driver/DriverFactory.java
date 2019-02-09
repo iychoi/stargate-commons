@@ -18,16 +18,12 @@ package stargate.commons.driver;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
  * @author iychoi
  */
 public class DriverFactory {
-    
-    private static final Log LOG = LogFactory.getLog(DriverFactory.class);
     
     public static AbstractDriver createDriver(DriverInjection driverInjection) throws DriverFailedToLoadException {
         if(driverInjection == null) {

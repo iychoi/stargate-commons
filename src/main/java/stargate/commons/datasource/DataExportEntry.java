@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -30,8 +28,6 @@ import stargate.commons.utils.JsonSerializer;
  * @author iychoi
  */
 public class DataExportEntry {
-    
-    private static final Log LOG = LogFactory.getLog(DataExportEntry.class);
     
     private URI sourceURI;
     private String stargatePath;
@@ -53,8 +49,6 @@ public class DataExportEntry {
     }
     
     DataExportEntry() {
-        this.sourceURI = null;
-        this.stargatePath = null;
     }
     
     public DataExportEntry(URI sourceURI, String stargatePath) {
@@ -66,7 +60,8 @@ public class DataExportEntry {
             throw new IllegalArgumentException("stargatePath is null or empty");
         }
         
-        initialize(sourceURI, stargatePath);
+        this.sourceURI = sourceURI;
+        this.stargatePath = stargatePath;
     }
     
     public DataExportEntry(String sourceURI, String stargatePath) throws URISyntaxException {
@@ -78,19 +73,7 @@ public class DataExportEntry {
             throw new IllegalArgumentException("stargatePath is null or empty");
         }
         
-        initialize(new URI(sourceURI), stargatePath);
-    }
-    
-    private void initialize(URI sourceURI, String stargatePath) {
-        if(sourceURI == null) {
-            throw new IllegalArgumentException("sourceURI is null");
-        }
-        
-        if(stargatePath == null || stargatePath.isEmpty()) {
-            throw new IllegalArgumentException("stargatePath is null or empty");
-        }
-        
-        this.sourceURI = sourceURI;
+        this.sourceURI = new URI(sourceURI);
         this.stargatePath = stargatePath;
     }
     

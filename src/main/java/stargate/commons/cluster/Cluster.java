@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -37,8 +35,6 @@ import stargate.commons.utils.DateTimeUtils;
  */
 public class Cluster {
 
-    private static final Log LOG = LogFactory.getLog(Cluster.class);
-    
     protected String name;
     private Map<String, Node> nodes = new HashMap<String, Node>();
     protected long lastUpdateTime;
@@ -60,8 +56,6 @@ public class Cluster {
     }
     
     Cluster() {
-        this.name = null;
-        this.lastUpdateTime = 0;
     }
     
     public Cluster(String name) throws IOException {
@@ -262,6 +256,10 @@ public class Cluster {
     
     @JsonProperty("last_update_time")
     public void setLastUpdateTime(long time) {
+        if(time < 0) {
+            throw new IllegalArgumentException("time is negative");
+        }
+        
         this.lastUpdateTime = time;
     }
     

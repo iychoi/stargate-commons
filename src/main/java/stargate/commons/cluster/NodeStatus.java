@@ -17,8 +17,6 @@ package stargate.commons.cluster;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -29,8 +27,6 @@ import stargate.commons.utils.DateTimeUtils;
  * @author iychoi
  */
 public class NodeStatus {
-    private static final Log LOG = LogFactory.getLog(NodeStatus.class);
-    
     private int failureCount;
     private long lastFailureTime;
     
@@ -54,11 +50,6 @@ public class NodeStatus {
     }
     
     public NodeStatus() {
-        this.failureCount = 0;
-        this.lastFailureTime = 0;
-        
-        this.blacklisted = false;
-        this.blacklistedTime = 0;
     }
     
     @JsonProperty("failures")

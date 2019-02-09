@@ -30,16 +30,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
  * @author iychoi
  */
 public class IPUtils {
-    private static final Log LOG = LogFactory.getLog(IPUtils.class);
-    
     private static String cached_public_ip_address;
     private static HashSet<String> cached_host_names = new HashSet<String>();
     private static HashSet<String> cached_ip_addresses = new HashSet<String>();
@@ -158,16 +154,28 @@ public class IPUtils {
     }
     
     public static boolean isIPAddress(String address) {
+        if(address == null || address.isEmpty()) {
+            throw new IllegalArgumentException("address is null or empty");
+        }
+        
         Matcher matcher = IP_pattern.matcher(address);
         return matcher.matches();
     }
     
     public static boolean isDomainName(String address) {
+        if(address == null || address.isEmpty()) {
+            throw new IllegalArgumentException("address is null or empty");
+        }
+        
         Matcher matcher = Domain_pattern.matcher(address);
         return matcher.matches();
     }
 
     public static boolean isPublicIPAddress(String address) {
+        if(address == null || address.isEmpty()) {
+            throw new IllegalArgumentException("address is null or empty");
+        }
+        
         Matcher matcher = IP_pattern.matcher(address);
         if(matcher.matches()) {
             String first = matcher.group(1);
@@ -195,6 +203,10 @@ public class IPUtils {
     }
     
     public static boolean isLocalIPAddress(String address) throws IOException {
+        if(address == null || address.isEmpty()) {
+            throw new IllegalArgumentException("address is null or empty");
+        }
+        
         Collection<String> localhostAddress = IPUtils.getHostNames();
         Set<String> localhostAddrSet = new HashSet<String>();
         localhostAddrSet.addAll(localhostAddress);
@@ -218,6 +230,10 @@ public class IPUtils {
     }
     
     public static boolean containLocalIPAddress(Collection<String> addresses) throws IOException {
+        if(addresses == null) {
+            throw new IllegalArgumentException("addresses is null");
+        }
+        
         for(String address : addresses) {
             boolean result = isLocalIPAddress(address);
             if(result) {
