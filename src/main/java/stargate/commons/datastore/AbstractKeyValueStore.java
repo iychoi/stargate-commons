@@ -40,4 +40,7 @@ public abstract class AbstractKeyValueStore {
     
     public abstract void clear() throws IOException;
     public abstract Map<String, Object> toMap() throws IOException;
+    
+    public abstract void addLayoutEventHandler(AbstractDataStoreLayoutEventHandler eventHandler);
+    public abstract void removeLayoutEventHandler(AbstractDataStoreLayoutEventHandler eventHandler);
 }
