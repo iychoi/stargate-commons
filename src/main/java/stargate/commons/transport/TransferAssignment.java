@@ -51,7 +51,7 @@ public class TransferAssignment {
     TransferAssignment() {
     }
     
-    TransferAssignment(DataObjectURI uri, String hash, String transferNode) {
+    public TransferAssignment(DataObjectURI uri, String hash, String transferNode) {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
