@@ -17,6 +17,7 @@ package stargate.commons.cluster;
 
 import java.io.IOException;
 import stargate.commons.driver.AbstractDriver;
+import stargate.commons.driver.DriverNotInitializedException;
 
 /**
  *
@@ -24,13 +25,13 @@ import stargate.commons.driver.AbstractDriver;
  */
 public abstract class AbstractClusterDriver extends AbstractDriver {
     
-    public abstract void activateCluster() throws IOException;
-    public abstract boolean isClusterActive() throws IOException;
+    public abstract void activateCluster() throws IOException, DriverNotInitializedException;
+    public abstract boolean isClusterActive() throws IOException, DriverNotInitializedException;
     
-    public abstract Node getLocalNode() throws IOException;
-    public abstract Cluster getLocalCluster() throws IOException;
-    public abstract String getLeaderNodeName() throws IOException;
-    public abstract boolean isLeaderNode() throws IOException;
+    public abstract Node getLocalNode() throws IOException, DriverNotInitializedException;
+    public abstract Cluster getLocalCluster() throws IOException, DriverNotInitializedException;
+    public abstract String getLeaderNodeName() throws IOException, DriverNotInitializedException;
+    public abstract boolean isLeaderNode() throws IOException, DriverNotInitializedException;
     
     public abstract void addLocalClusterEventHandler(AbstractLocalClusterEventHandler eventHandler);
     public abstract void removeLocalClusterEventHandler(AbstractLocalClusterEventHandler eventHandler);

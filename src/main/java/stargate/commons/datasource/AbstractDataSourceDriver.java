@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.Collection;
 import stargate.commons.cluster.Cluster;
 import stargate.commons.driver.AbstractDriver;
+import stargate.commons.driver.DriverNotInitializedException;
 
 /**
  *
@@ -31,9 +32,9 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
     
     public abstract String getScheme();
     
-    public abstract SourceFileMetadata getMetadata(URI uri) throws IOException, FileNotFoundException;
+    public abstract SourceFileMetadata getMetadata(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException;
     
-    public boolean exist(URI uri) throws IOException {
+    public boolean exist(URI uri) throws IOException, DriverNotInitializedException {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
@@ -46,7 +47,7 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
         }
     }
     
-    public boolean isDirectory(URI uri) throws IOException, FileNotFoundException {
+    public boolean isDirectory(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
@@ -55,7 +56,7 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
         return metadata.isDirectory();
     }
     
-    public boolean isFile(URI uri) throws IOException, FileNotFoundException {
+    public boolean isFile(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
@@ -64,7 +65,7 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
         return metadata.isFile();
     }
     
-    public long getFileSize(URI uri) throws IOException, FileNotFoundException {
+    public long getFileSize(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
@@ -72,7 +73,7 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
         SourceFileMetadata metadata = getMetadata(uri);
         return metadata.getFileSize();
     }
-    public long getLastModifiedTime(URI uri) throws IOException, FileNotFoundException {
+    public long getLastModifiedTime(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
@@ -81,12 +82,12 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
         return metadata.getLastModifiedTime();
     }
     
-    public abstract Collection<URI> listDirectory(URI uri) throws IOException, FileNotFoundException;
-    public abstract Collection<SourceFileMetadata> listDirectoryWithMetadata(URI uri) throws IOException, FileNotFoundException;
+    public abstract Collection<URI> listDirectory(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException;
+    public abstract Collection<SourceFileMetadata> listDirectoryWithMetadata(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException;
     
-    public abstract InputStream openFile(URI uri) throws IOException, FileNotFoundException;
-    public abstract InputStream openFile(URI uri, long offset, int size) throws IOException, FileNotFoundException;
+    public abstract InputStream openFile(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException;
+    public abstract InputStream openFile(URI uri, long offset, int size) throws IOException, FileNotFoundException, DriverNotInitializedException;
     
     // returns node names
-    public abstract Collection<String> listBlockLocations(Cluster cluster, URI uri, long offset, int size) throws IOException, FileNotFoundException;
+    public abstract Collection<String> listBlockLocations(Cluster cluster, URI uri, long offset, int size) throws IOException, FileNotFoundException, DriverNotInitializedException;
 }

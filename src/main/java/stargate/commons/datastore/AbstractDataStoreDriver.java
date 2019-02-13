@@ -18,13 +18,14 @@ package stargate.commons.datastore;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import stargate.commons.driver.AbstractDriver;
+import stargate.commons.driver.DriverNotInitializedException;
 
 /**
  *
  * @author iychoi
  */
 public abstract class AbstractDataStoreDriver extends AbstractDriver {
-    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property) throws IOException;
-    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property, TimeUnit timeunit, long timeval) throws IOException;
-    public abstract AbstractQueue getQueue(String name, Class valueClass, EnumDataStoreProperty property) throws IOException;
+    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property) throws IOException, DriverNotInitializedException;
+    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property, TimeUnit timeunit, long timeval) throws IOException, DriverNotInitializedException;
+    public abstract AbstractQueue getQueue(String name, Class valueClass, EnumDataStoreProperty property) throws IOException, DriverNotInitializedException;
 }

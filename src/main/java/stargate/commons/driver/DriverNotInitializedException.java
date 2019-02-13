@@ -13,16 +13,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.schedule;
-
-import java.io.IOException;
-import stargate.commons.driver.AbstractDriver;
-import stargate.commons.driver.DriverNotInitializedException;
+package stargate.commons.driver;
 
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractScheduleDriver extends AbstractDriver {
-    public abstract void scheduleTask(DistributedTask task) throws IOException, DriverNotInitializedException;
+public class DriverNotInitializedException extends Exception {
+
+    public DriverNotInitializedException() {
+        super();
+    }
+
+    public DriverNotInitializedException(String string) {
+        super(string);
+    }
+
+    public DriverNotInitializedException(String string, Throwable thrwbl) {
+        super(string, thrwbl);
+    }
+
+    public DriverNotInitializedException(Throwable thrwbl) {
+        super(thrwbl);
+    }
 }

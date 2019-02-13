@@ -18,16 +18,17 @@ package stargate.commons.userinterface;
 import java.io.IOException;
 import java.net.URI;
 import stargate.commons.driver.AbstractDriver;
+import stargate.commons.driver.DriverNotInitializedException;
 
 /**
  *
  * @author iychoi
  */
 public abstract class AbstractUserInterfaceDriver extends AbstractDriver {
-    public abstract void startServer() throws IOException;
-    public abstract void stopServer() throws IOException;
+    public abstract void startServer() throws IOException, DriverNotInitializedException;
+    public abstract void stopServer() throws IOException, DriverNotInitializedException;
     public abstract boolean isServerStarted();
-    public abstract URI getServiceURI() throws IOException;
+    public abstract URI getServiceURI() throws IOException, DriverNotInitializedException;
     
-    public abstract AbstractUserInterfaceClient getClient(URI serviceURI) throws IOException;
+    public abstract AbstractUserInterfaceClient getClient(URI serviceURI) throws IOException, DriverNotInitializedException;
 }

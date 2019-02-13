@@ -17,6 +17,7 @@ package stargate.commons.event;
 
 import java.io.IOException;
 import stargate.commons.driver.AbstractDriver;
+import stargate.commons.driver.DriverNotInitializedException;
 
 /**
  *
@@ -27,5 +28,5 @@ public abstract class AbstractEventDriver extends AbstractDriver {
     public abstract void addEventHandler(AbstractEventHandler eventHandler);
     public abstract void removeEventHandler(AbstractEventHandler eventHandler);
     
-    public abstract void raiseEvent(StargateEvent event) throws IOException;
+    public abstract void raiseEvent(StargateEvent event) throws IOException, DriverNotInitializedException;
 }
