@@ -34,7 +34,7 @@ public class StargateEvent {
     private StargateEventType eventType;
     private Set<String> receiverNodeNames=  new HashSet<String>();
     private String senderNodeName;
-    private Object value;
+    private String jsonValue;
     
     public static StargateEvent createInstance(File file) throws IOException {
         if(file == null) {
@@ -55,7 +55,7 @@ public class StargateEvent {
     StargateEvent() {
     }
     
-    public StargateEvent(StargateEventType eventType, Collection<String> receiverNodeNames, String senderNodeName, Object value) {
+    public StargateEvent(StargateEventType eventType, Collection<String> receiverNodeNames, String senderNodeName, String jsonValue) {
         if(eventType == null) {
             throw new IllegalArgumentException("eventType is null");
         }
@@ -68,17 +68,17 @@ public class StargateEvent {
             throw new IllegalArgumentException("senderNodeName is null or empty");
         }
         
-        if(value == null) {
-            throw new IllegalArgumentException("value is null");
+        if(jsonValue == null) {
+            throw new IllegalArgumentException("jsonValue is null");
         }
         
         this.eventType = eventType;
         this.receiverNodeNames.addAll(receiverNodeNames);
         this.senderNodeName = senderNodeName;
-        this.value = value;
+        this.jsonValue = jsonValue;
     }
     
-    public StargateEvent(StargateEventType eventType, String receiverNodeName, String senderNodeName, Object value) {
+    public StargateEvent(StargateEventType eventType, String receiverNodeName, String senderNodeName, String jsonValue) {
         if(eventType == null) {
             throw new IllegalArgumentException("eventType is null");
         }
@@ -91,14 +91,14 @@ public class StargateEvent {
             throw new IllegalArgumentException("senderNodeName is null or empty");
         }
         
-        if(value == null) {
-            throw new IllegalArgumentException("value is null");
+        if(jsonValue == null) {
+            throw new IllegalArgumentException("jsonValue is null");
         }
         
         this.eventType = eventType;
         this.receiverNodeNames.add(receiverNodeName);
         this.senderNodeName = senderNodeName;
-        this.value = value;
+        this.jsonValue = jsonValue;
     }
     
     @JsonProperty("event_type")
@@ -154,18 +154,18 @@ public class StargateEvent {
         this.senderNodeName = senderNodeName;
     }
     
-    @JsonProperty("value")
-    public Object getValue() {
-        return this.value;
+    @JsonProperty("json_value")
+    public String getJsonValue() {
+        return this.jsonValue;
     }
     
-    @JsonProperty("value")
-    public void setValue(Object value) {
+    @JsonProperty("json_value")
+    public void setJsonValue(String value) {
         if(value == null) {
             throw new IllegalArgumentException("value is null");
         }
         
-        this.value = value;
+        this.jsonValue = value;
     }
     
     @JsonIgnore
