@@ -30,6 +30,7 @@ import stargate.commons.utils.JsonSerializer;
 public class ServiceConfig extends AbstractImmutableConfig {
     
     protected ManagerConfig clusterManagerConfig;
+    protected ManagerConfig eventManagerConfig;
     protected ManagerConfig dataSourceManagerConfig;
     protected ManagerConfig dataStoreManagerConfig;
     protected ManagerConfig recipeManagerConfig;
@@ -63,6 +64,10 @@ public class ServiceConfig extends AbstractImmutableConfig {
         
         if(this.clusterManagerConfig != null) {
             this.clusterManagerConfig.setImmutable();
+        }
+        
+        if(this.eventManagerConfig != null) {
+            this.eventManagerConfig.setImmutable();
         }
         
         if(this.dataSourceManagerConfig != null) {
@@ -104,6 +109,22 @@ public class ServiceConfig extends AbstractImmutableConfig {
     @JsonProperty("cluster")
     public ManagerConfig getClusterConfig() {
         return this.clusterManagerConfig;
+    }
+    
+    @JsonProperty("event")
+    public void setEventConfig(ManagerConfig eventConfig) {
+        if(eventConfig == null) {
+            throw new IllegalArgumentException("eventConfig is null");
+        }
+        
+        super.checkMutableAndRaiseException();
+        
+        this.eventManagerConfig = eventConfig;
+    }
+    
+    @JsonProperty("event")
+    public ManagerConfig getEventConfig() {
+        return this.eventManagerConfig;
     }
     
     @JsonProperty("data_source")
@@ -181,9 +202,9 @@ public class ServiceConfig extends AbstractImmutableConfig {
         this.userInterfaceManagerConfig = userInterfaceConfig;
     }
     
-    @JsonProperty("schedule")
-    public ManagerConfig getScheduleConfig() {
-        return this.scheduleManagerConfig;
+    @JsonProperty("user_interface")
+    public ManagerConfig getUserInterfaceConfig() {
+        return this.userInterfaceManagerConfig;
     }
     
     @JsonProperty("schedule")
@@ -197,8 +218,8 @@ public class ServiceConfig extends AbstractImmutableConfig {
         this.scheduleManagerConfig = scheduleConfig;
     }
     
-    @JsonProperty("user_interface")
-    public ManagerConfig getUserInterfaceConfig() {
-        return this.userInterfaceManagerConfig;
+    @JsonProperty("schedule")
+    public ManagerConfig getScheduleConfig() {
+        return this.scheduleManagerConfig;
     }
 }
