@@ -32,7 +32,7 @@ import stargate.commons.utils.JsonSerializer;
 public class StargateEvent {
     
     private StargateEventType eventType;
-    private Set<String> receiverNodeNames=  new HashSet<String>();
+    private Set<String> receiverNodeNames = new HashSet<String>();
     private String senderNodeName;
     private String jsonValue;
     
