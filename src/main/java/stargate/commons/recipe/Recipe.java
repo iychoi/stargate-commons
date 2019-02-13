@@ -168,7 +168,7 @@ public class Recipe {
             throw new IllegalArgumentException("hashAlgorithm is null");
         }
         
-        this.hashAlgorithm = hashAlgorithm.trim();
+        this.hashAlgorithm = hashAlgorithm;
     }
     
     @JsonProperty("chunk_size")
@@ -270,7 +270,7 @@ public class Recipe {
             throw new IllegalArgumentException("hash is null or empty");
         }
         
-        Integer idx = this.chunkHashes.get(hash.trim().toLowerCase());
+        Integer idx = this.chunkHashes.get(hash);
         if(idx == null) {
             return null;
         }

@@ -200,7 +200,7 @@ public class RecipeChunk {
             throw new IllegalArgumentException("hash is null or empty");
         }
         
-        this.hash = hash.trim().toLowerCase();
+        this.hash = hash;
     }
 
     @JsonIgnore
@@ -209,7 +209,7 @@ public class RecipeChunk {
             throw new IllegalArgumentException("hash is null or empty");
         }
         
-        return this.hash.equalsIgnoreCase(hash.trim());
+        return this.hash.equals(hash);
     }
     
     @JsonProperty("node_ids")
