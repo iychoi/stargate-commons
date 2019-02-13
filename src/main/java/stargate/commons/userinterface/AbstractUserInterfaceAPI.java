@@ -26,6 +26,7 @@ import stargate.commons.dataobject.DataObjectURI;
 import stargate.commons.datasource.DataExportEntry;
 import stargate.commons.recipe.Recipe;
 import stargate.commons.service.FSServiceInfo;
+import stargate.commons.transport.TransferAssignment;
 
 /**
  *
@@ -65,7 +66,7 @@ public abstract class AbstractUserInterfaceAPI {
     
     public abstract InputStream getDataChunk(DataObjectURI uri, String hash) throws IOException;
     
-    public abstract String schedulePrefetch(DataObjectURI uri, String hash) throws IOException;
+    public abstract TransferAssignment schedulePrefetch(DataObjectURI uri, String hash) throws IOException;
     public abstract Recipe getRemoteRecipeWithTransferSchedule(DataObjectURI uri) throws IOException;
     public abstract Collection<String> listDataSources() throws IOException;
 }
