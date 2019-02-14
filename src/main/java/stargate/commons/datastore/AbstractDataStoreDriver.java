@@ -26,6 +26,6 @@ import stargate.commons.driver.DriverNotInitializedException;
  */
 public abstract class AbstractDataStoreDriver extends AbstractDriver {
     public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property) throws IOException, DriverNotInitializedException;
-    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property, TimeUnit timeunit, long timeval) throws IOException, DriverNotInitializedException;
+    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, EnumDataStoreProperty property, TimeUnit timeunit, long timeval, boolean allowKeyLock) throws IOException, DriverNotInitializedException;
     public abstract AbstractQueue getQueue(String name, Class valueClass, EnumDataStoreProperty property) throws IOException, DriverNotInitializedException;
 }
