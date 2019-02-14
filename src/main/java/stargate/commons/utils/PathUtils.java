@@ -167,17 +167,20 @@ public class PathUtils {
     }
     
     public static String makeAbsolutePath(String path) {
-        if(path == null || path.isEmpty()) {
-            throw new IllegalArgumentException("path is null or empty");
-        }
+        //if(path == null || path.isEmpty()) {
+        //    throw new IllegalArgumentException("path is null or empty");
+        //}
+        // path can be null
         
         StringBuilder sb = new StringBuilder();
         
-        if(path.startsWith("/")) {
-            sb.append(path);
-        } else {
-            sb.append("/");
-            sb.append(path);
+        sb.append("/");
+        if(path != null) {
+            if(path.startsWith("/")) {
+                sb.append(path.substring(1));
+            } else {
+                sb.append(path);
+            }
         }
         
         return sb.toString();
