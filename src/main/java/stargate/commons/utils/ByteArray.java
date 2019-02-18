@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2012 Facebook, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,30 +17,43 @@
 import java.util.Arrays;
 import java.util.Comparator;
 
-/**
- * helper class that wraps a byte[] in order to properly get
- * Arrays.hashcode()/equals() for use in a HashSet; also implements Comparable
- */
-public abstract class ByteArray implements Comparable<ByteArray> {
+public class ByteArray implements Comparable<ByteArray> {
 
     public static final ByteArrayComparator BYTE_ARRAY_COMPARATOR = new ByteArrayComparator();
 
-    abstract public byte[] getArray();
-
-    abstract public int getLength();
-
-    public abstract byte getAdjusted(int pos);
-
-    public static ByteArray wrap(byte[] array) {
-        return new PureByteArray(array);
+    private byte[] array;
+    
+    public ByteArray(byte[] array) {
+        this.array = array;
     }
 
-    public static ByteArray wrap(byte[] array, int offset) {
-        return new ByteArrayView(array, offset);
+    public byte[] getArray() {
+        return array;
     }
 
-    public static ByteArray wrap(byte[] array, int offset, int length) {
-        return new ByteArrayView(array, offset, length);
+    public int getLength() {
+        return array.length;
+    }
+    
+    public byte getAdjusted(int pos) {
+        return array[pos];
+    }
+    
+    @Override
+    public int compareTo(ByteArray o) {
+        return BYTE_ARRAY_COMPARATOR.compare(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return array != null ? Arrays.hashCode(array) : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "ByteArray{"
+                + "array=" + Arrays.toString(array)
+                + '}';
     }
 
     public static boolean equals(ByteArray array1, ByteArray array2) {
@@ -68,6 +82,7 @@ public abstract class ByteArray implements Comparable<ByteArray> {
         return Arrays.equals(array1.getArray(), array2.getArray());
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -79,105 +94,6 @@ public abstract class ByteArray implements Comparable<ByteArray> {
         final ByteArray that = (ByteArray) o;
 
         return ByteArray.equals(this, that);
-    }
-
-    private static class PureByteArray extends ByteArray {
-
-        private final byte[] array;
-
-        private PureByteArray(byte[] array) {
-            this.array = array;
-        }
-
-        @Override
-        public byte[] getArray() {
-            return array;
-        }
-
-        @Override
-        public int getLength() {
-            return array.length;
-        }
-
-        @Override
-        public byte getAdjusted(int pos) {
-            return array[pos];
-        }
-
-        @Override
-        public int compareTo(ByteArray o) {
-            return BYTE_ARRAY_COMPARATOR.compare(this, o);
-        }
-
-        @Override
-        public int hashCode() {
-            return array != null ? Arrays.hashCode(array) : 0;
-        }
-
-        @Override
-        public String toString() {
-            return "PureByteArray{"
-                    + "array=" + Arrays.toString(array)
-                    + '}';
-        }
-    }
-
-    private static class ByteArrayView extends ByteArray {
-
-        private final byte[] array;
-        private final int offset;
-        private final int length;
-
-        private ByteArrayView(byte[] array, int offset, int length) {
-            this.array = array;
-            this.offset = offset;
-            this.length = length;
-        }
-
-        private ByteArrayView(byte[] array, int offset) {
-            this(array, offset, array.length - offset);
-        }
-
-        private ByteArrayView(byte[] array) {
-            this(array, 0, array.length);
-        }
-
-        @Override
-        public byte[] getArray() {
-            return array;
-        }
-
-        @Override
-        public int getLength() {
-            return length;
-        }
-
-        @Override
-        public byte getAdjusted(int pos) {
-            return array[offset + pos];
-        }
-
-        @Override
-        public int hashCode() {
-            int result = array != null ? Arrays.hashCode(array) : 0;
-            result = 31 * result + offset;
-            result = 31 * result + length;
-            return result;
-        }
-
-        @Override
-        public int compareTo(ByteArray o) {
-            return BYTE_ARRAY_COMPARATOR.compare(this, o);
-        }
-
-        @Override
-        public String toString() {
-            return "ByteArrayView{"
-                    + "array=" + Arrays.toString(array)
-                    + ", start=" + offset
-                    + ", length=" + length
-                    + "} " + toString();
-        }
     }
 
     private static class ByteArrayComparator implements Comparator<ByteArray> {
