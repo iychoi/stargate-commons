@@ -28,7 +28,7 @@ import java.io.OutputStream;
  */
 public class IOUtils {
     
-    private static int BUFFER_SIZE = 4096;
+    private static int BUFFER_SIZE = 64*1024;
     
     public static String readString(InputStream is) throws IOException {
         return new String(read(is));
