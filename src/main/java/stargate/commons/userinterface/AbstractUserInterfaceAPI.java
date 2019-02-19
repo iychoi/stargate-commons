@@ -75,4 +75,5 @@ public abstract class AbstractUserInterfaceAPI {
     
     public abstract Collection<StatisticsEntry> getStatistics(StatisticsType type) throws IOException;
     public abstract void clearStatistics(StatisticsType type) throws IOException;
+    public abstract void clearAllStatistics() throws IOException;
 }

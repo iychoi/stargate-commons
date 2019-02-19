@@ -20,7 +20,30 @@ package stargate.commons.statistics;
  * @author iychoi
  */
 public enum StatisticsType {
-    STATISTICS_TYPE_RECIPE_CHUNK_CREATION,
-    STATISTICS_TYPE_DATA_CHUNK_TRANSFER_RECEIVE,
-    STATISTICS_TYPE_DATA_CHUNK_TRANSFER_SEND
+    STATISTICS_TYPE_RECIPE_CHUNK_CREATION ("CHUNK"),
+    STATISTICS_TYPE_DATA_CHUNK_TRANSFER_RECEIVE ("TRANSFER_RECV"),
+    STATISTICS_TYPE_DATA_CHUNK_TRANSFER_SEND ("TRANSFER_SEND");
+    
+    private String strVal;
+    
+    StatisticsType(String strVal) {
+        this.strVal = strVal;
+    }
+    
+    public String getStrVal() {
+        return this.strVal;
+    }
+    
+    public static StatisticsType fromStrVal(String strVal) {
+        for(StatisticsType type : StatisticsType.values()) {
+            if(type.getStrVal().equalsIgnoreCase(strVal)) {
+                return type;
+            }
+            
+            if(type.name().equalsIgnoreCase(strVal)) {
+                return type;
+            }
+        }
+        return null;
+    }
 }
