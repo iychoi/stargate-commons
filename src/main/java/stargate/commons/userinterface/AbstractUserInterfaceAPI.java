@@ -26,6 +26,8 @@ import stargate.commons.dataobject.DataObjectURI;
 import stargate.commons.datasource.DataExportEntry;
 import stargate.commons.recipe.Recipe;
 import stargate.commons.service.FSServiceInfo;
+import stargate.commons.statistics.StatisticsEntry;
+import stargate.commons.statistics.StatisticsType;
 import stargate.commons.transport.TransferAssignment;
 
 /**
@@ -43,6 +45,7 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract void activateCluster() throws IOException;
     public abstract boolean isClusterActive() throws IOException;
     public abstract Node getLocalNode() throws IOException;
+    public abstract Node getLeaderNode() throws IOException;
     
     public abstract Collection<String> listRemoteClusters() throws IOException;
     public abstract Collection<Cluster> getRemoteClusters() throws IOException;
@@ -69,4 +72,7 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract TransferAssignment schedulePrefetch(DataObjectURI uri, String hash) throws IOException;
     public abstract Recipe getRemoteRecipeWithTransferSchedule(DataObjectURI uri) throws IOException;
     public abstract Collection<String> listDataSources() throws IOException;
+    
+    public abstract Collection<StatisticsEntry> getStatistics(StatisticsType type) throws IOException;
+    public abstract void clearStatistics(StatisticsType type) throws IOException;
 }
