@@ -115,7 +115,7 @@ public class RestfulClient {
                 requestURL = new URI(urlString + path);
             }
         } catch (URISyntaxException ex) {
-            LOG.error(ex);
+            LOG.error("URISyntaxException", ex);
             requestURL = this.serviceURL.resolve(path);
         }
         return requestURL;

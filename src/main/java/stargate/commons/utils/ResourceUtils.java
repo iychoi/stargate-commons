@@ -44,7 +44,7 @@ public class ResourceUtils {
                 return null;
             }
         } catch (URISyntaxException ex) {
-            LOG.error(ex);
+            LOG.error("URISyntaxException", ex);
             return null;
         }
     }

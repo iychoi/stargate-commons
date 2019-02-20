@@ -235,7 +235,7 @@ public class Node {
             }
             return false;
         } catch (IOException ex) {
-            LOG.error(ex);
+            LOG.error("IOException", ex);
             return false;
         }
     }
