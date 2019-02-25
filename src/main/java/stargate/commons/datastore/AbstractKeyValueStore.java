@@ -18,7 +18,6 @@ package stargate.commons.datastore;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 
 /**
  *
@@ -43,8 +42,6 @@ public abstract class AbstractKeyValueStore {
     
     public abstract void clear() throws IOException;
     public abstract Map<String, Object> toMap() throws IOException;
-    
-    public abstract Lock getKeyLock(String key);
     
     public abstract void addLayoutEventHandler(AbstractDataStoreLayoutEventHandler eventHandler);
     public abstract void removeLayoutEventHandler(AbstractDataStoreLayoutEventHandler eventHandler);
