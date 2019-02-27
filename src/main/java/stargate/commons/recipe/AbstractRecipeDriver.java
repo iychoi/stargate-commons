@@ -17,6 +17,7 @@ package stargate.commons.recipe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import stargate.commons.driver.AbstractDriver;
 import stargate.commons.driver.DriverNotInitializedException;
 
@@ -28,7 +29,6 @@ public abstract class AbstractRecipeDriver extends AbstractDriver {
     public abstract int getChunkSize();
     public abstract String getHashAlgorithm();
     
-    public abstract byte[] calculateHash(byte[] buffer) throws IOException, DriverNotInitializedException;
-    public abstract RecipeChunk produceRecipeChunk(InputStream is, long offset) throws IOException, DriverNotInitializedException;
-    public abstract RecipeChunk produceRecipeChunk(byte[] buffer, long offset, int len) throws IOException, DriverNotInitializedException;
+    public abstract Collection<RecipeChunk> produceRecipeChunks(InputStream is) throws IOException, DriverNotInitializedException;
+    public abstract RecipeChunk produceRecipeChunk(InputStream is) throws IOException, DriverNotInitializedException;
 }

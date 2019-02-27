@@ -86,7 +86,7 @@ public abstract class AbstractDataSourceDriver extends AbstractDriver {
     public abstract Collection<SourceFileMetadata> listDirectoryWithMetadata(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException;
     
     public abstract InputStream openFile(URI uri) throws IOException, FileNotFoundException, DriverNotInitializedException;
-    public abstract InputStream openFile(URI uri, long offset, int size) throws IOException, FileNotFoundException, DriverNotInitializedException;
+    public abstract InputStream openFile(URI uri, long offset, long size) throws IOException, FileNotFoundException, DriverNotInitializedException;
     
     // returns node names
     public abstract Collection<String> listBlockLocations(Cluster cluster, URI uri, long offset, int size) throws IOException, FileNotFoundException, DriverNotInitializedException;
