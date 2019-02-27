@@ -185,6 +185,15 @@ public class Recipe {
         this.chunkSize = chunkSize;
     }
     
+    @JsonIgnore
+    public int getEffectiveChunkSize(RecipeChunk chunk) {
+        if(chunk == null) {
+            throw new IllegalArgumentException("chunk is null");
+        }
+        
+        return Math.min(this.chunkSize, chunk.getLength());
+    }
+    
     @JsonProperty("node_names")
     public synchronized Collection<String> getNodeNames() {
         return Collections.unmodifiableCollection(this.nodeNames);
