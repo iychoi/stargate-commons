@@ -34,6 +34,7 @@ public abstract class AbstractManager<D extends AbstractDriver> {
     private static final Log LOG = LogFactory.getLog(AbstractManager.class);
     
     protected AbstractService service;
+    protected ManagerConfig config;
     protected List<D> drivers = new ArrayList<D>();
     protected boolean started = false;
     
@@ -43,6 +44,14 @@ public abstract class AbstractManager<D extends AbstractDriver> {
     
     public AbstractService getService() {
         return this.service;
+    }
+    
+    public void setConfig(ManagerConfig config) {
+        this.config = config;
+    }
+    
+    public ManagerConfig getConfig() {
+        return this.config;
     }
     
     public boolean needDriver() {
