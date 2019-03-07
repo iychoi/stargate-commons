@@ -19,6 +19,6 @@ package stargate.commons.datastore;
  *
  * @author iychoi
  */
-public abstract class AbstractDataStoreLayoutEventHandler {
-    public abstract void added(AbstractKeyValueStore store, String key, String nodeName);
+public abstract class AbstractDataStoreEventHandler {
+    public abstract void added(AbstractKeyValueStore store, String key);
 }

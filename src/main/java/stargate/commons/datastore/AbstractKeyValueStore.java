@@ -38,11 +38,14 @@ public abstract class AbstractKeyValueStore {
     public abstract boolean replace(String key, Object oldValue, Object newValue) throws IOException;
     public abstract void remove(String key) throws IOException;
     public abstract Collection<String> keys() throws IOException;
-    public abstract String getNodeForData(String key) throws IOException;
+    
+    public abstract String getPrimaryNodeForData(String key) throws IOException;
+    public abstract Collection<String> getBackupNodesForData(String key) throws IOException;
+    public abstract Collection<String> getPrimaryAndBackupNodesForData(String key) throws IOException;
     
     public abstract void clear() throws IOException;
     public abstract Map<String, Object> toMap() throws IOException;
     
-    public abstract void addLayoutEventHandler(AbstractDataStoreLayoutEventHandler eventHandler);
-    public abstract void removeLayoutEventHandler(AbstractDataStoreLayoutEventHandler eventHandler);
+    public abstract void addLayoutEventHandler(AbstractDataStoreEventHandler eventHandler);
+    public abstract void removeLayoutEventHandler(AbstractDataStoreEventHandler eventHandler);
 }
