@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.config.AbstractImmutableConfig;
@@ -39,7 +37,6 @@ import stargate.commons.driver.DriverInjection;
 public class ManagerConfig extends AbstractImmutableConfig {
     
     private List<DriverInjection> driverSettings = new ArrayList<DriverInjection>();
-    private Map<String, String> params = new HashMap<String, String>();
     
     public static ManagerConfig createInstance(File file) throws IOException {
         if(file == null) {
@@ -85,59 +82,6 @@ public class ManagerConfig extends AbstractImmutableConfig {
     @JsonProperty("driver_setting")
     public Collection<DriverInjection> getDriverSettings() {
         return Collections.unmodifiableCollection(this.driverSettings);
-    }
-    
-    @JsonProperty("params")
-    public void addParams(Map<String, String> params) {
-        if(params == null || params.isEmpty()) {
-            throw new IllegalArgumentException("params is null or empty");
-        }
-        
-        super.checkMutableAndRaiseException();
-        
-        this.params.putAll(params);
-    }
-    
-    @JsonIgnore
-    public void addParam(String key, String value) {
-        if(key == null || key.isEmpty()) {
-            throw new IllegalArgumentException("key is null or empty");
-        }
-        
-        if(value == null || value.isEmpty()) {
-            throw new IllegalArgumentException("value is null or empty");
-        }
-        
-        super.checkMutableAndRaiseException();
-        
-        this.params.put(key, value);
-    }
-    
-    @JsonProperty("params")
-    public Map<String, String> getParams() {
-        return Collections.unmodifiableMap(this.params);
-    }
-    
-    @JsonIgnore
-    public String getParam(String key) {
-        if(key == null || key.isEmpty()) {
-            throw new IllegalArgumentException("key is null or empty");
-        }
-        
-        return this.params.get(key);
-    }
-    
-    @JsonIgnore
-    public String getParam(String key, String defaultValue) {
-        if(key == null || key.isEmpty()) {
-            throw new IllegalArgumentException("key is null or empty");
-        }
-        
-        String val = this.params.get(key);
-        if(val == null) {
-            return defaultValue;
-        }
-        return val;
     }
     
     @Override
