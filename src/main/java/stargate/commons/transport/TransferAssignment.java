@@ -118,8 +118,8 @@ public class TransferAssignment {
     @JsonIgnore
     public String toString() {
         return "TransferAssignment{" + "uri=" + uri + ", hash=" + hash + ", transferNode=" + transferNode + '}';
-    }
-    
+            }
+        
     @JsonIgnore
     public String toJson() throws IOException {
         return JsonSerializer.toJson(this);
