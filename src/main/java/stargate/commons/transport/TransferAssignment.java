@@ -17,6 +17,10 @@ package stargate.commons.transport;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.dataobject.DataObjectURI;
@@ -31,6 +35,7 @@ public class TransferAssignment {
     private DataObjectURI uri;
     private String hash;
     private String transferNode;
+    private List<String> accessNodes = new ArrayList<String>();
     
     public static TransferAssignment createInstance(File file) throws IOException {
         if(file == null) {
@@ -51,7 +56,7 @@ public class TransferAssignment {
     TransferAssignment() {
     }
     
-    public TransferAssignment(DataObjectURI uri, String hash, String transferNode) {
+    public TransferAssignment(DataObjectURI uri, String hash, String transferNode, Collection<String> accessNodes) {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
@@ -64,9 +69,14 @@ public class TransferAssignment {
             throw new IllegalArgumentException("transferNode is null or empty");
         }
         
+        if(accessNodes == null) {
+            throw new IllegalArgumentException("accessNodes is null");
+        }
+        
         this.uri = uri;
         this.hash = hash.toLowerCase();
         this.transferNode = transferNode;
+        this.accessNodes.addAll(accessNodes);
     }
     
     @JsonProperty("uri")
@@ -114,11 +124,37 @@ public class TransferAssignment {
         this.transferNode = transferNode;
     }
     
+    @JsonProperty("access_nodes")
+    public Collection<String> getAccessNodes() {
+        return Collections.unmodifiableCollection(this.accessNodes);
+    }
+    
+    @JsonProperty("access_nodes")
+    public void addAccessNodes(Collection<String> accessNodes) {
+        if(accessNodes == null) {
+            throw new IllegalArgumentException("accessNodes is null");
+        }
+        
+        for(String accessNode : accessNodes) {
+            addAccessNode(accessNode);
+        }
+    }
+    
+    @JsonIgnore
+    public void addAccessNode(String accessNode) {
+        if(accessNode == null || accessNode.isEmpty()) {
+            throw new IllegalArgumentException("accessNode is null or empty");
+        }
+        
+        this.accessNodes.add(accessNode);
+    }
+    
+    
     @Override
     @JsonIgnore
     public String toString() {
         return "TransferAssignment{" + "uri=" + uri + ", hash=" + hash + ", transferNode=" + transferNode + '}';
-            }
+    }
         
     @JsonIgnore
     public String toJson() throws IOException {
