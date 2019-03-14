@@ -145,12 +145,12 @@ public class RecipeChunk {
     }
     
     @JsonProperty("offset")
-    public long getOffset() {
+    public synchronized long getOffset() {
         return this.offset;
     }
     
     @JsonProperty("offset")
-    public void setOffset(long offset) {
+    public synchronized void setOffset(long offset) {
         if(offset < 0) {
             throw new IllegalArgumentException("offset is negative");
         }
@@ -159,12 +159,12 @@ public class RecipeChunk {
     }
     
     @JsonProperty("length")
-    public int getLength() {
+    public synchronized int getLength() {
         return this.length;
     }
     
     @JsonProperty("length")
-    public void setLength(int len) {
+    public synchronized void setLength(int len) {
         if(len < 0) {
             throw new IllegalArgumentException("len is negative");
         }
@@ -173,12 +173,12 @@ public class RecipeChunk {
     }
 
     @JsonProperty("hash")
-    public String getHash() {
+    public synchronized String getHash() {
         return this.hash;
     }
     
     @JsonIgnore
-    public byte[] getHashBytes() {
+    public synchronized byte[] getHashBytes() {
         if(this.hash == null) {
             return null;
         }
@@ -186,7 +186,7 @@ public class RecipeChunk {
     }
     
     @JsonIgnore
-    public void setHashBytes(byte[] hash) {
+    public synchronized void setHashBytes(byte[] hash) {
         if(hash == null) {
             this.hash = null;
         } else {
@@ -195,7 +195,7 @@ public class RecipeChunk {
     }
     
     @JsonProperty("hash")
-    public void setHash(String hash) {
+    public synchronized void setHash(String hash) {
         if(hash == null || hash.isEmpty()) {
             throw new IllegalArgumentException("hash is null or empty");
         }
@@ -204,7 +204,7 @@ public class RecipeChunk {
     }
 
     @JsonIgnore
-    public boolean hasHash(String hash) {
+    public synchronized boolean hasHash(String hash) {
         if(hash == null || hash.isEmpty()) {
             throw new IllegalArgumentException("hash is null or empty");
         }
@@ -213,17 +213,17 @@ public class RecipeChunk {
     }
     
     @JsonProperty("node_ids")
-    public Collection<Integer> getNodeIDs() {
+    public synchronized Collection<Integer> getNodeIDs() {
         return Collections.unmodifiableCollection(this.nodeIDs);
     }
     
     @JsonIgnore
-    public boolean isAccessibleFromAllNode() {
+    public synchronized boolean isAccessibleFromAllNode() {
         return this.nodeIDs.contains(NODE_ID_ALL_NODES);
     }
     
     @JsonProperty("node_ids")
-    public void addNodeIDs(Collection<Integer> nodeIDs) {
+    public synchronized void addNodeIDs(Collection<Integer> nodeIDs) {
         if(nodeIDs == null) {
             throw new IllegalArgumentException("nodeIDs is null");
         }
@@ -234,7 +234,7 @@ public class RecipeChunk {
     }
     
     @JsonIgnore
-    public void addNodeID(int nodeID) {
+    public synchronized void addNodeID(int nodeID) {
         if(nodeID < 0 && nodeID != NODE_ID_ALL_NODES) {
             throw new IllegalArgumentException("nodeID is negative");
         }
@@ -243,19 +243,19 @@ public class RecipeChunk {
     }
     
     @JsonIgnore
-    public void setAccessibleFromAllNode() {
+    public synchronized void setAccessibleFromAllNode() {
         this.nodeIDs.clear();
         this.nodeIDs.add(NODE_ID_ALL_NODES);
     }
     
     @JsonIgnore
-    public void clearNodeIDs() {
+    public synchronized void clearNodeIDs() {
         this.nodeIDs.clear();
     }
     
     @Override
     @JsonIgnore
-    public String toString() {
+    public synchronized String toString() {
         return this.offset + ", " + this.length + ", " + this.hash;
     }
     
