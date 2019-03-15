@@ -26,7 +26,7 @@ import java.util.Map;
 public abstract class AbstractKeyValueStore {
     public abstract String getName();
     public abstract Class getValueClass();
-    public abstract EnumDataStoreProperty getProperty();
+    public abstract DataStoreProperties getProperties();
     
     public abstract int size();
     public abstract boolean isEmpty();

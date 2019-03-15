@@ -25,7 +25,7 @@ import java.util.List;
 public abstract class AbstractQueue {
     public abstract String getName();
     public abstract Class getValueClass();
-    public abstract EnumDataStoreProperty getProperty();
+    public abstract DataStoreProperties getProperties();
     
     public abstract int size();
     public abstract boolean isEmpty();
