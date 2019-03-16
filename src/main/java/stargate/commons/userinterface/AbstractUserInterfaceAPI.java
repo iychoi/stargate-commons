@@ -52,6 +52,7 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract Cluster getRemoteCluster(String name) throws IOException;
     public abstract void addRemoteCluster(Cluster cluster) throws IOException;
     public abstract void removeRemoteCluster(String name) throws IOException;
+    public abstract void syncRemoteClusters() throws IOException;
 
     public abstract Collection<String> listDataExportEntries() throws IOException;
     public abstract Collection<DataExportEntry> getDataExportEntries() throws IOException;
