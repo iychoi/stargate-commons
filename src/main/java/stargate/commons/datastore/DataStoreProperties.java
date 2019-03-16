@@ -103,15 +103,15 @@ public class DataStoreProperties extends Properties {
         this.setProperty(DATASTORE_PROPERTY_EXPIRE_TIMEUNIT, timeunit.name());
     }
     
-    public int getExpireTimeVal() {
+    public long getExpireTimeVal() {
         if(this.isExpirable()) {
             String property = this.getProperty(DATASTORE_PROPERTY_EXPIRE_TIMEVAL, DEFAULT_DATASTORE_PROPERTY_EXPIRE_TIMEVAL_VALUE);
-            return Math.max(0, Integer.parseInt(property));
+            return Math.max(0, Long.parseLong(property));
         }
         return 0;
     }
     
-    public void setExpireTimeVal(int timeval) {
-        this.setProperty(DATASTORE_PROPERTY_EXPIRE_TIMEVAL, Integer.toString(timeval));
+    public void setExpireTimeVal(long timeval) {
+        this.setProperty(DATASTORE_PROPERTY_EXPIRE_TIMEVAL, Long.toString(timeval));
     }
 }
