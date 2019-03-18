@@ -38,6 +38,7 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract boolean isLive() throws IOException;
     public abstract String getServiceConfig() throws IOException;
     public abstract FSServiceInfo getFSServiceInfo() throws IOException;
+    public abstract UserInterfaceInitialDataPack getInitialDataPack() throws IOException;
     
     public abstract Cluster getCluster(String name) throws IOException;
     
