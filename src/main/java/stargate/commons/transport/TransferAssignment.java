@@ -153,7 +153,7 @@ public class TransferAssignment {
     @Override
     @JsonIgnore
     public String toString() {
-        return "TransferAssignment{" + "uri=" + uri + ", hash=" + hash + ", transferNode=" + transferNode + '}';
+        return "TransferAssignment{" + "uri=" + uri + ", hash=" + hash + ", transferNode=" + transferNode + "}";
     }
         
     @JsonIgnore
