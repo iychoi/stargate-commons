@@ -17,10 +17,10 @@ package stargate.commons.statistics;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -31,7 +31,8 @@ import stargate.commons.utils.JsonSerializer;
  */
 public class Statistics {
     private StatisticsType type;
-    private List<StatisticsEntry> entries = new ArrayList<StatisticsEntry>();
+    private Queue<StatisticsEntry> entries = new LinkedList<StatisticsEntry>();
+    private int capacity = Integer.MAX_VALUE; // unlimited
     
     public static Statistics createInstance(File file) throws IOException {
         if(file == null) {
@@ -52,25 +53,17 @@ public class Statistics {
     Statistics() {
     }
 
-    public Statistics(StatisticsType type) {
+    public Statistics(StatisticsType type, int capacity) {
         if(type == null) {
             throw new IllegalArgumentException("type is null");
         }
         
-        this.type = type;
-    }
-    
-    public Statistics(StatisticsType type, Collection<StatisticsEntry> entries) {
-        if(type == null) {
-            throw new IllegalArgumentException("type is null");
-        }
-        
-        if(entries == null) {
-            throw new IllegalArgumentException("entries is null");
+        if(capacity <= 0) {
+            throw new IllegalArgumentException("capacity is negative");
         }
         
         this.type = type;
-        this.entries.addAll(entries);
+        this.capacity = capacity;
     }
     
     @JsonProperty("type")
@@ -87,6 +80,31 @@ public class Statistics {
         this.type = type;
     }
     
+    @JsonProperty("capacity")
+    public synchronized int getCapacity() {
+        return this.capacity;
+    }
+    
+    @JsonProperty("capacity")
+    public synchronized void setCapacity(int capacity) {
+        if(capacity <= 0) {
+            throw new IllegalArgumentException("capacity is negative");
+        }
+        
+        this.capacity = capacity;
+        
+        compact();
+    }
+    
+    private void compact() {
+        if(this.entries.size() > this.capacity) {
+            int del = this.entries.size() - this.capacity;
+            for(int i=0;i<del;i++) {
+                this.entries.poll();
+            }
+        }
+    }
+    
     @JsonProperty("entries")
     public synchronized Collection<StatisticsEntry> getEntries() {
         return Collections.unmodifiableCollection(this.entries);
@@ -98,7 +116,9 @@ public class Statistics {
             throw new IllegalArgumentException("entries is null");
         }
         
-        this.entries.addAll(entries);
+        for(StatisticsEntry entry : entries) {
+            addEntry(entry);
+        }
     }
     
     @JsonIgnore
@@ -108,31 +128,12 @@ public class Statistics {
         }
         
         this.entries.add(entry);
+        compact();
     }
     
     @JsonIgnore
     public synchronized void clear() {
         this.entries.clear();
-    }
-    
-    @JsonIgnore
-    public synchronized long getLastTimestamp() {
-        if(this.entries.size() > 0) {
-            StatisticsEntry entry = this.entries.get(this.entries.size() - 1);
-            return entry.getTimestamp();
-        } else {
-            return 0;
-        }
-    }
-    
-    @JsonIgnore
-    public synchronized long getFirstTimestamp() {
-        if(this.entries.size() > 0) {
-            StatisticsEntry entry = this.entries.get(0);
-            return entry.getTimestamp();
-        } else {
-            return 0;
-        }
     }
     
     @JsonIgnore
