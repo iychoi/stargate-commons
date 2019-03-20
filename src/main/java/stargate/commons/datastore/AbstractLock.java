@@ -15,16 +15,16 @@
 */
 package stargate.commons.datastore;
 
-import java.io.IOException;
-import stargate.commons.driver.AbstractDriver;
-import stargate.commons.driver.DriverNotInitializedException;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractDataStoreDriver extends AbstractDriver {
-    public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, DataStoreProperties properties) throws IOException, DriverNotInitializedException;
-    public abstract AbstractQueue getQueue(String name, Class valueClass, DataStoreProperties properties) throws IOException, DriverNotInitializedException;
-    public abstract AbstractLock getLock(String name) throws IOException, DriverNotInitializedException;
+public abstract class AbstractLock {
+    public abstract String getName();
+    public abstract void lock();
+    public abstract boolean tryLock();
+    public abstract boolean tryLock(long timeout, TimeUnit unit);
+    public abstract void unlock();
 }
