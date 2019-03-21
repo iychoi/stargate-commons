@@ -34,9 +34,11 @@ public abstract class AbstractKeyValueStore {
     
     public abstract Object get(String key) throws IOException;
     public abstract void put(String key, Object value) throws IOException;
+    public abstract void putAsync(String key, Object value) throws IOException;
     public abstract boolean putIfAbsent(String key, Object value) throws IOException;
     public abstract boolean replace(String key, Object oldValue, Object newValue) throws IOException;
     public abstract void remove(String key) throws IOException;
+    public abstract void removeAsync(String key) throws IOException;
     public abstract Collection<String> keys() throws IOException;
     
     public abstract String getPrimaryNodeForData(String key) throws IOException;
@@ -44,5 +46,6 @@ public abstract class AbstractKeyValueStore {
     public abstract Collection<String> getPrimaryAndBackupNodesForData(String key) throws IOException;
     
     public abstract void clear() throws IOException;
+    public abstract void clearAsync() throws IOException;
     public abstract Map<String, Object> toMap() throws IOException;
 }
