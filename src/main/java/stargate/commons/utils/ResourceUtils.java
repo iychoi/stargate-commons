@@ -16,8 +16,11 @@
 package stargate.commons.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import stargate.commons.service.AbstractService;
@@ -47,5 +50,13 @@ public class ResourceUtils {
             LOG.error("URISyntaxException", ex);
             return null;
         }
+    }
+    
+    public static InputStream openHTTPFile(URL url) throws IOException {
+        if(url == null) {
+            throw new IllegalArgumentException("url is null");
+        }
+        
+        return url.openStream();
     }
 }
