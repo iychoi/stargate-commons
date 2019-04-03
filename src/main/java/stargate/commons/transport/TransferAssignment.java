@@ -34,6 +34,7 @@ public class TransferAssignment {
 
     private DataObjectURI uri;
     private String hash;
+    private long offset;
     private String transferNode;
     private List<String> accessNodes = new ArrayList<String>();
     
@@ -56,13 +57,17 @@ public class TransferAssignment {
     TransferAssignment() {
     }
     
-    public TransferAssignment(DataObjectURI uri, String hash, String transferNode, Collection<String> accessNodes) {
+    public TransferAssignment(DataObjectURI uri, String hash, long offset, String transferNode, Collection<String> accessNodes) {
         if(uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
         
         if(hash == null || hash.isEmpty()) {
             throw new IllegalArgumentException("hash is null or empty");
+        }
+        
+        if(offset < 0) {
+            throw new IllegalArgumentException("offset is negative");
         }
         
         if(transferNode == null || transferNode.isEmpty()) {
@@ -75,6 +80,7 @@ public class TransferAssignment {
         
         this.uri = uri;
         this.hash = hash.toLowerCase();
+        this.offset = offset;
         this.transferNode = transferNode;
         this.accessNodes.addAll(accessNodes);
     }
@@ -108,6 +114,20 @@ public class TransferAssignment {
         } else {
             this.hash = hash.toLowerCase();
         }
+    }
+    
+    @JsonProperty("offset")
+    public long getOffset() {
+        return this.offset;
+    }
+    
+    @JsonProperty("offset")
+    public void setOffset(long offset) {
+        if(offset < 0) {
+            throw new IllegalArgumentException("offset is negative");
+        }
+        
+        this.offset = offset;
     }
     
     @JsonProperty("transfer_node")
@@ -153,7 +173,7 @@ public class TransferAssignment {
     @Override
     @JsonIgnore
     public String toString() {
-        return "TransferAssignment{" + "uri=" + uri + ", hash=" + hash + ", transferNode=" + transferNode + "}";
+        return "TransferAssignment{" + "uri=" + uri + ", hash=" + hash + ", offset=" + offset + ", transferNode=" + transferNode + "}";
     }
         
     @JsonIgnore
