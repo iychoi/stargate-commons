@@ -69,6 +69,29 @@ public class IPUtils {
     
     private static void fillHostnamesCache() throws IOException {
         if(cached_host_names.isEmpty() || cached_ip_addresses.isEmpty()) {
+            InetAddress localHost = InetAddress.getLocalHost();
+        
+            String hostName = localHost.getHostName();
+            if(isMeaningfulHostAddress(hostName)) {
+                if(!cached_host_names.contains(hostName)) {
+                    cached_host_names.add(hostName);
+                }
+            }
+            
+            String hostAddress = localHost.getHostAddress();
+            if(isMeaningfulHostAddress(hostAddress)) {
+                if(!cached_ip_addresses.contains(hostAddress)) {
+                    cached_ip_addresses.add(hostAddress);
+                }
+            }
+            
+            String canonicalHostName = localHost.getCanonicalHostName();
+            if(isMeaningfulHostAddress(canonicalHostName)) {
+                if(!cached_host_names.contains(canonicalHostName)) {
+                    cached_host_names.add(canonicalHostName);
+                }
+            }
+                
             try {
                 Enumeration e = NetworkInterface.getNetworkInterfaces();
                 while (e.hasMoreElements()) {
@@ -77,21 +100,21 @@ public class IPUtils {
                     while (ee.hasMoreElements()) {
                         InetAddress i = (InetAddress) ee.nextElement();
                         if(!i.isLoopbackAddress()) {
-                            String hostAddress = i.getHostAddress();
+                            hostAddress = i.getHostAddress();
                             if(isMeaningfulHostAddress(hostAddress)) {
                                 if(!cached_ip_addresses.contains(hostAddress)) {
                                     cached_ip_addresses.add(hostAddress);
                                 }
                             }
 
-                            String hostName = i.getHostName();
+                            hostName = i.getHostName();
                             if(isMeaningfulHostAddress(hostName)) {
                                 if(!cached_host_names.contains(hostName)) {
                                     cached_host_names.add(hostName);
                                 }
                             }
 
-                            String canonicalHostName = i.getCanonicalHostName();
+                            canonicalHostName = i.getCanonicalHostName();
                             if(isMeaningfulHostAddress(canonicalHostName)) {
                                 if(!cached_host_names.contains(canonicalHostName)) {
                                     cached_host_names.add(canonicalHostName);
@@ -112,6 +135,11 @@ public class IPUtils {
         HashSet<String> hostnames = new HashSet<String>();
         hostnames.addAll(cached_host_names);
         hostnames.addAll(cached_ip_addresses);
+        String publicIPAddress = getPublicIPAddress();
+        if(!hostnames.contains(publicIPAddress)) {
+            hostnames.add(publicIPAddress);
+        }
+        
         return Collections.unmodifiableSet(hostnames);
     }
     
@@ -179,20 +207,12 @@ public class IPUtils {
         Matcher matcher = IP_pattern.matcher(address);
         if(matcher.matches()) {
             String first = matcher.group(1);
-            String second = matcher.group(2);
+            //String second = matcher.group(2);
             
             int f = Integer.parseInt(first);
-            int s = Integer.parseInt(second);
+            //int s = Integer.parseInt(second);
             
-            if(f == 192 && s == 168) {
-                return false;
-            }
-            
-            if(f == 172 && s >= 16 && s <= 31) {
-                return false;
-            }
-            
-            if(f == 10) {
+            if(f == 192 || f == 172 || f == 10) {
                 return false;
             }
             

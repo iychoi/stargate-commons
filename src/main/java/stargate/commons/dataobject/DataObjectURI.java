@@ -17,6 +17,8 @@ package stargate.commons.dataobject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -25,6 +27,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * @author iychoi
  */
 public class DataObjectURI implements Comparable {
+    
+    private static final Log LOG = LogFactory.getLog(DataObjectURI.class);
 
     /*
     DataObjectURI consists of 
@@ -278,26 +282,35 @@ public class DataObjectURI implements Comparable {
     
     @JsonIgnore
     public DataObjectURI getParent() {
+        String authority = this.uri.getAuthority();
         String path = this.uri.getPath();
         int lastSlash = path.lastIndexOf('/');
         
         // empty
         if (path.length() == 0) {
-            return null;
+            if(authority == null || authority.isEmpty()) {
+                return null;
+            } else {
+                return new DataObjectURI("", "/");
+            }
         }
         
         // root
         if (path.length() == 1 && lastSlash == 0) {
-            return null;
+            if(authority == null || authority.isEmpty()) {
+                return null;
+            } else {
+                return new DataObjectURI("", "/");
+            }
         }
         
         if (lastSlash == -1) {
-            return new DataObjectURI(createURI(this.uri.getAuthority(), "."));
+            return new DataObjectURI(createURI(authority, "/"));
         } else if (lastSlash == 0) {
-            return new DataObjectURI(createURI(this.uri.getAuthority(), "/"));
+            return new DataObjectURI(createURI(authority, "/"));
         } else {
             String parent = path.substring(0, lastSlash);
-            return new DataObjectURI(createURI(this.uri.getAuthority(), parent));
+            return new DataObjectURI(createURI(authority, parent));
         }
     }
     

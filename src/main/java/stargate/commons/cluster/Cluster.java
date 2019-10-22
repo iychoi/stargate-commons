@@ -130,6 +130,54 @@ public class Cluster {
     }
     
     @JsonIgnore
+    public Collection<Node> getDataNodes() throws IOException {
+        List<Node> dataNodes = new ArrayList<Node>();
+        for(Node node : this.nodes.values()) {
+            if(node.isDataNode()) {
+                dataNodes.add(node);
+            }
+        }
+        
+        return Collections.unmodifiableCollection(dataNodes);
+    }
+    
+    @JsonIgnore
+    public Collection<String> getDataNodeNames() throws IOException {
+        List<String> dataNodeNames = new ArrayList<String>();
+        for(Node node : this.nodes.values()) {
+            if(node.isDataNode()) {
+                dataNodeNames.add(node.getName());
+            }
+        }
+        
+        return Collections.unmodifiableCollection(dataNodeNames);
+    }
+    
+    @JsonIgnore
+    public Collection<Node> getNonDataNodes() throws IOException {
+        List<Node> nonDataNodes = new ArrayList<Node>();
+        for(Node node : this.nodes.values()) {
+            if(!node.isDataNode()) {
+                nonDataNodes.add(node);
+            }
+        }
+        
+        return Collections.unmodifiableCollection(nonDataNodes);
+    }
+    
+    @JsonIgnore
+    public Collection<String> getNonDataNodeNames() throws IOException {
+        List<String> nonDataNodeNames = new ArrayList<String>();
+        for(Node node : this.nodes.values()) {
+            if(!node.isDataNode()) {
+                nonDataNodeNames.add(node.getName());
+            }
+        }
+        
+        return Collections.unmodifiableCollection(nonDataNodeNames);
+    }
+    
+    @JsonIgnore
     public Node getNode(String nodeName) {
         if(nodeName == null || nodeName.isEmpty()) {
             throw new IllegalArgumentException("nodeName is null or empty");

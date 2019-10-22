@@ -15,6 +15,10 @@
 */
 package stargate.commons.datastore;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +44,9 @@ public class DataStoreProperties extends Properties {
     
     public static final String DATASTORE_PROPERTY_EXPIRE_TIMEVAL = "expire_timeval";
     public static final String DEFAULT_DATASTORE_PROPERTY_EXPIRE_TIMEVAL_VALUE = "0";
+    
+    public static final String DATASTORE_PROPERTY_NON_DATA_NODES = "non_data_nodes";
+    public static final String DEFAULT_DATASTORE_PROPERTY_NON_DATA_NODES = "";
     
     public boolean isSharded() {
         String property = this.getProperty(DATASTORE_PROPERTY_SHARDED, DEFAULT_DATASTORE_PROPERTY_SHARDED_VALUE);
@@ -113,5 +120,49 @@ public class DataStoreProperties extends Properties {
     
     public void setExpireTimeVal(long timeval) {
         this.setProperty(DATASTORE_PROPERTY_EXPIRE_TIMEVAL, Long.toString(timeval));
+    }
+    
+    public Collection<String> getNonDataNodes() {
+        String property = this.getProperty(DATASTORE_PROPERTY_NON_DATA_NODES, DEFAULT_DATASTORE_PROPERTY_NON_DATA_NODES);
+        String[] nonDataNodes = property.split(",");
+        List<String> nonDataNodesList = new ArrayList<String>();
+        if(!property.isEmpty()) {
+            for(String nonDataNode : nonDataNodes) {
+                nonDataNodesList.add(nonDataNode);
+            }
+        }
+        return Collections.unmodifiableCollection(nonDataNodesList);
+    }
+    
+    public void addNonDataNode(String nodeName) {
+        String property = this.getProperty(DATASTORE_PROPERTY_NON_DATA_NODES, DEFAULT_DATASTORE_PROPERTY_NON_DATA_NODES);
+        if(!property.isEmpty()) {
+            property = property + "," + nodeName;
+        } else {
+            property = nodeName;
+        }
+        this.setProperty(DATASTORE_PROPERTY_NON_DATA_NODES, property);
+    }
+    
+    public void addNonDataNodes(Collection<String> nodeNames) {
+        String property = this.getProperty(DATASTORE_PROPERTY_NON_DATA_NODES, DEFAULT_DATASTORE_PROPERTY_NON_DATA_NODES);
+        StringBuilder sb = new StringBuilder();
+        for(String nodeName : nodeNames) {
+            if(sb.length() != 0) {
+                sb.append(",");
+            }
+            sb.append(nodeName);
+        }
+        
+        if(!property.isEmpty()) {
+            property = property + "," + sb.toString();
+        } else {
+            property = sb.toString();
+        }
+        this.setProperty(DATASTORE_PROPERTY_NON_DATA_NODES, property);
+    }
+    
+    public void clearNonDataNodes() {
+        this.setProperty(DATASTORE_PROPERTY_NON_DATA_NODES, DEFAULT_DATASTORE_PROPERTY_NON_DATA_NODES);
     }
 }
