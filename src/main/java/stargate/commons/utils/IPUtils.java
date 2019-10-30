@@ -36,9 +36,11 @@ import java.util.regex.Pattern;
  * @author iychoi
  */
 public class IPUtils {
-    private static String cached_public_ip_address;
-    private static HashSet<String> cached_host_names = new HashSet<String>();
-    private static HashSet<String> cached_ip_addresses = new HashSet<String>();
+    private static String cached_public_ip_address = null;
+    private static HashSet<String> cached_dns_host_names = new HashSet<String>();
+    private static HashSet<String> cached_nic_host_names = new HashSet<String>();
+    private static HashSet<String> cached_dns_ip_addresses = new HashSet<String>();
+    private static HashSet<String> cached_nic_ip_addresses = new HashSet<String>();
     
     private static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 		"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -67,31 +69,35 @@ public class IPUtils {
         return true;
     }
     
-    private static void fillHostnamesCache() throws IOException {
-        if(cached_host_names.isEmpty() || cached_ip_addresses.isEmpty()) {
+    private static void fillCache() throws IOException {
+        if(cached_dns_host_names.isEmpty() || cached_dns_ip_addresses.isEmpty()) {
+            // DNS
             InetAddress localHost = InetAddress.getLocalHost();
         
             String hostName = localHost.getHostName();
             if(isMeaningfulHostAddress(hostName)) {
-                if(!cached_host_names.contains(hostName)) {
-                    cached_host_names.add(hostName);
+                if(!cached_dns_host_names.contains(hostName)) {
+                    cached_dns_host_names.add(hostName);
                 }
             }
             
             String hostAddress = localHost.getHostAddress();
             if(isMeaningfulHostAddress(hostAddress)) {
-                if(!cached_ip_addresses.contains(hostAddress)) {
-                    cached_ip_addresses.add(hostAddress);
+                if(!cached_dns_ip_addresses.contains(hostAddress)) {
+                    cached_dns_ip_addresses.add(hostAddress);
                 }
             }
             
             String canonicalHostName = localHost.getCanonicalHostName();
             if(isMeaningfulHostAddress(canonicalHostName)) {
-                if(!cached_host_names.contains(canonicalHostName)) {
-                    cached_host_names.add(canonicalHostName);
+                if(!cached_dns_host_names.contains(canonicalHostName)) {
+                    cached_dns_host_names.add(canonicalHostName);
                 }
             }
-                
+        }
+        
+        if(cached_nic_host_names.isEmpty() || cached_nic_ip_addresses.isEmpty()) {
+            // NIC
             try {
                 Enumeration e = NetworkInterface.getNetworkInterfaces();
                 while (e.hasMoreElements()) {
@@ -100,24 +106,24 @@ public class IPUtils {
                     while (ee.hasMoreElements()) {
                         InetAddress i = (InetAddress) ee.nextElement();
                         if(!i.isLoopbackAddress()) {
-                            hostAddress = i.getHostAddress();
+                            String hostAddress = i.getHostAddress();
                             if(isMeaningfulHostAddress(hostAddress)) {
-                                if(!cached_ip_addresses.contains(hostAddress)) {
-                                    cached_ip_addresses.add(hostAddress);
+                                if(!cached_nic_ip_addresses.contains(hostAddress)) {
+                                    cached_nic_ip_addresses.add(hostAddress);
                                 }
                             }
 
-                            hostName = i.getHostName();
+                            String hostName = i.getHostName();
                             if(isMeaningfulHostAddress(hostName)) {
-                                if(!cached_host_names.contains(hostName)) {
-                                    cached_host_names.add(hostName);
+                                if(!cached_nic_host_names.contains(hostName)) {
+                                    cached_nic_host_names.add(hostName);
                                 }
                             }
 
-                            canonicalHostName = i.getCanonicalHostName();
+                            String canonicalHostName = i.getCanonicalHostName();
                             if(isMeaningfulHostAddress(canonicalHostName)) {
-                                if(!cached_host_names.contains(canonicalHostName)) {
-                                    cached_host_names.add(canonicalHostName);
+                                if(!cached_nic_host_names.contains(canonicalHostName)) {
+                                    cached_nic_host_names.add(canonicalHostName);
                                 }
                             }
                         }
@@ -127,32 +133,8 @@ public class IPUtils {
                 throw new IOException(ex);
             }
         }
-    }
-    
-    public static Collection<String> getHostNames() throws IOException {
-        fillHostnamesCache();
         
-        HashSet<String> hostnames = new HashSet<String>();
-        hostnames.addAll(cached_host_names);
-        hostnames.addAll(cached_ip_addresses);
-        String publicIPAddress = getPublicIPAddress();
-        if(!hostnames.contains(publicIPAddress)) {
-            hostnames.add(publicIPAddress);
-        }
-        
-        return Collections.unmodifiableSet(hostnames);
-    }
-    
-    public static Collection<String> getIPAddresses() throws IOException {
-        fillHostnamesCache();
-        
-        return Collections.unmodifiableSet(cached_ip_addresses);
-    }
-    
-    public static String getPublicIPAddress() throws IOException {
-        if(cached_public_ip_address != null && !cached_public_ip_address.isEmpty()) {
-            return cached_public_ip_address;
-        } else {
+        if(cached_public_ip_address == null) {
             try {
                 URL whatismyip = new URL("http://checkip.amazonaws.com");
                 BufferedReader in = null;
@@ -163,7 +145,6 @@ public class IPUtils {
                     if(isIPAddress(ip)) {
                         // cache
                         cached_public_ip_address = ip;
-                        return ip;
                     } else {
                         throw new IOException(String.format("Cannot obtain correct public IP address - got %s", ip));
                     }
@@ -179,6 +160,76 @@ public class IPUtils {
                 throw new IOException(ex);
             }
         }
+    }
+    
+    public static Collection<String> getAllHostNames() throws IOException {
+        fillCache();
+        
+        HashSet<String> hostnames = new HashSet<String>();
+        hostnames.addAll(cached_dns_host_names);
+        hostnames.addAll(cached_nic_host_names);
+        hostnames.addAll(cached_dns_ip_addresses);
+        hostnames.addAll(cached_nic_ip_addresses);
+        String publicIPAddress = getPublicIPAddress();
+        if(!hostnames.contains(publicIPAddress)) {
+            hostnames.add(publicIPAddress);
+        }
+        
+        return Collections.unmodifiableSet(hostnames);
+    }
+    
+    public static Collection<String> getHostNames() throws IOException {
+        fillCache();
+        
+        HashSet<String> hostnames = new HashSet<String>();
+        hostnames.addAll(cached_dns_host_names);
+        hostnames.addAll(cached_nic_host_names);
+        
+        return Collections.unmodifiableSet(hostnames);
+    }
+    
+    public static Collection<String> getDNSHostNames() throws IOException {
+        fillCache();
+        
+        return Collections.unmodifiableSet(cached_dns_host_names);
+    }
+    
+    public static Collection<String> getNICHostNames() throws IOException {
+        fillCache();
+        
+        return Collections.unmodifiableSet(cached_nic_host_names);
+    }
+    
+    public static Collection<String> getIPAddresses() throws IOException {
+        fillCache();
+        
+        HashSet<String> ipaddresses = new HashSet<String>();
+        ipaddresses.addAll(cached_dns_ip_addresses);
+        ipaddresses.addAll(cached_nic_ip_addresses);
+        String publicIPAddress = getPublicIPAddress();
+        if(!ipaddresses.contains(publicIPAddress)) {
+            ipaddresses.add(publicIPAddress);
+        }
+        
+        return Collections.unmodifiableSet(ipaddresses);
+    }
+    
+    public static Collection<String> getDNSIPAddresses() throws IOException {
+        fillCache();
+        
+        return Collections.unmodifiableSet(cached_dns_ip_addresses);
+    }
+    
+    public static Collection<String> getNICIPAddresses() throws IOException {
+        fillCache();
+        
+        return Collections.unmodifiableSet(cached_nic_ip_addresses);
+    }
+    
+    public static String getPublicIPAddress() throws IOException {
+        fillCache();
+        
+        return cached_public_ip_address;
     }
     
     public static boolean isIPAddress(String address) {
@@ -227,7 +278,7 @@ public class IPUtils {
             throw new IllegalArgumentException("address is null or empty");
         }
         
-        Collection<String> localhostAddress = IPUtils.getHostNames();
+        Collection<String> localhostAddress = IPUtils.getAllHostNames();
         Set<String> localhostAddrSet = new HashSet<String>();
         localhostAddrSet.addAll(localhostAddress);
         

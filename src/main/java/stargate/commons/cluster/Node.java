@@ -228,7 +228,7 @@ public class Node {
     @JsonIgnore
     public boolean isLocal() {
         try {
-            Collection<String> localHostNames = IPUtils.getHostNames();
+            Collection<String> localHostNames = IPUtils.getAllHostNames();
 
             for(String localHostName : localHostNames) {
                 if(this.hostNames.contains(localHostName)) {
