@@ -25,20 +25,18 @@ public class RecipeChunkComparator implements Comparator<RecipeChunk> {
 
     @Override
     public int compare(RecipeChunk c1, RecipeChunk c2) {
-        if(c1 == c2) {
+        if(c1 == null && c2 == null) {
             return 0;
         }
         
-        if(c1 == null || c2 == null) {
-            if(c1 == null) {
-                return -1;
-            }
+        if(c1 == null) {
+            return -1;
+        }
             
-            if(c2 == null) {
-                return 1;
-            }
+        if(c2 == null) {
+            return 1;
         }
         
-        return (int) (c1.getOffset() - c2.getOffset());
+        return Long.compare(c1.getOffset(), c2.getOffset());
     }
 }

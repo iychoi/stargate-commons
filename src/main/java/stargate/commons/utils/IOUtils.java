@@ -15,9 +15,10 @@
 */
 package stargate.commons.utils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,25 +32,7 @@ public class IOUtils {
     private static int BUFFER_SIZE = 64*1024;
     
     public static String readString(InputStream is) throws IOException {
-        return new String(read(is));
-    }
-    
-    public static byte[] read(InputStream is) throws IOException {
-        if(is == null) {
-            throw new IllegalArgumentException("is is null");
-        }
-        
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        BufferedInputStream bis = new BufferedInputStream(is);
-        
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int read = 0;
-        
-        while((read = bis.read(buffer, 0, BUFFER_SIZE)) > 0) {
-            baos.write(buffer, 0, read);
-        }
-        
-        return baos.toByteArray();
+        return new String(toByteArray(is));
     }
     
     public static void writeString(OutputStream os, String json) throws IOException {
@@ -84,5 +67,61 @@ public class IOUtils {
         
         output.close();
         return output.toByteArray();
+    }
+    
+    public static byte[] toByteArray(final InputStream is, int arraySize) throws IOException {
+        if(is == null) {
+            throw new IllegalArgumentException("is is null");
+        }
+        
+        if(arraySize < 0) {
+            throw new IllegalArgumentException("arraySize is negative");
+        }   
+        
+        byte[] array = new byte[arraySize];
+        copyToByteArray(is, array);
+        return array;
+    }
+    
+    public static int copyToByteArray(final InputStream is, byte[] bytes) throws IOException {
+        if(is == null) {
+            throw new IllegalArgumentException("is is null");
+        }
+        
+        if(bytes == null) {
+            throw new IllegalArgumentException("bytes is null");
+        }
+        
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int read;
+        int offset = 0;
+        while ((read = is.read(buffer)) > 0) {
+            int myread = read;
+            if(offset + myread > bytes.length) {
+                myread = bytes.length - offset;
+            }
+            
+            System.arraycopy(buffer, 0, bytes, offset, myread);
+            offset += myread;
+            
+            if(myread != read) {
+                break;
+            }
+        }
+        return offset;
+    }
+    
+    public static void writeToFile(byte[] bytes, File file) throws IOException {
+        if(bytes == null) {
+            throw new IllegalArgumentException("bytes is null");
+        }
+        
+        if(file == null) {
+            throw new IllegalArgumentException("file is null");
+        }
+        
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(bytes);
+        fos.close();
     }
 }
