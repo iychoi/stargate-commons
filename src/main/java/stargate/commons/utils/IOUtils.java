@@ -32,7 +32,7 @@ public class IOUtils {
     private static int BUFFER_SIZE = 64*1024;
     
     public static String readString(InputStream is) throws IOException {
-        return new String(toByteArray(is));
+        return new String(IOUtils.toByteArray(is));
     }
     
     public static void writeString(OutputStream os, String json) throws IOException {
@@ -69,18 +69,31 @@ public class IOUtils {
         return output.toByteArray();
     }
     
-    public static byte[] toByteArray(final InputStream is, int arraySize) throws IOException {
+    public static byte[] toByteArray(final InputStream is, int sizeCap) throws IOException {
         if(is == null) {
             throw new IllegalArgumentException("is is null");
         }
         
-        if(arraySize < 0) {
-            throw new IllegalArgumentException("arraySize is negative");
+        if(sizeCap < 0) {
+            throw new IllegalArgumentException("sizeCap is negative");
         }   
         
-        byte[] array = new byte[arraySize];
-        copyToByteArray(is, array);
-        return array;
+        if(sizeCap == 0) {
+            return IOUtils.toByteArray(is);
+        } else {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+        
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int read;
+            int cap = sizeCap;
+            while ((read = is.read(buffer, 0, Math.min(cap, BUFFER_SIZE))) > 0) {
+                output.write(buffer, 0, read);
+                cap -= read;
+            }
+
+            output.close();
+            return output.toByteArray();
+        }        
     }
     
     public static int copyToByteArray(final InputStream is, byte[] bytes) throws IOException {

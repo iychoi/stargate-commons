@@ -48,9 +48,6 @@ public class DataStoreProperties extends Properties {
     public static final String DATASTORE_PROPERTY_NON_DATA_NODES = "non_data_nodes";
     public static final String DEFAULT_DATASTORE_PROPERTY_NON_DATA_NODES = "";
     
-    public static final String DATASTORE_PROPERTY_BIG_STORE = "big_store";
-    public static final String DEFAULT_DATASTORE_PROPERTY_BIG_STORE = "false";
-    
     public boolean isSharded() {
         String property = this.getProperty(DATASTORE_PROPERTY_SHARDED, DEFAULT_DATASTORE_PROPERTY_SHARDED_VALUE);
         return Boolean.parseBoolean(property);
@@ -167,14 +164,5 @@ public class DataStoreProperties extends Properties {
     
     public void clearNonDataNodes() {
         this.setProperty(DATASTORE_PROPERTY_NON_DATA_NODES, DEFAULT_DATASTORE_PROPERTY_NON_DATA_NODES);
-    }
-    
-    public boolean isBigStore() {
-        String property = this.getProperty(DATASTORE_PROPERTY_BIG_STORE, DEFAULT_DATASTORE_PROPERTY_BIG_STORE);
-        return Boolean.parseBoolean(property);
-    }
-    
-    public void setBigStore(boolean bigStore) {
-        this.setProperty(DATASTORE_PROPERTY_BIG_STORE, Boolean.toString(bigStore));
     }
 }
