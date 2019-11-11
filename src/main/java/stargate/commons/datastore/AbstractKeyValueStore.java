@@ -16,7 +16,6 @@
 package stargate.commons.datastore;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Future;
