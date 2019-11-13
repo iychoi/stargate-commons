@@ -28,6 +28,15 @@ public class ByteArray implements Comparable<ByteArray> {
     public ByteArray(byte[] array) {
         this.array = array;
     }
+    
+    public ByteArray(byte[] array, int length) {
+        if(length != array.length) {
+            this.array = new byte[length];
+            System.arraycopy(array, 0, this.array, 0, length);
+        } else {
+            this.array = array;
+        }
+    }
 
     public byte[] getArray() {
         return array;

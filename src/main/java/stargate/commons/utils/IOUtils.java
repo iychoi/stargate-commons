@@ -93,35 +93,33 @@ public class IOUtils {
 
             output.close();
             return output.toByteArray();
-        }        
+        } 
     }
     
-    public static int copyToByteArray(final InputStream is, byte[] bytes) throws IOException {
+    public static int toByteArray(final InputStream is, byte[] buffer, int length) throws IOException {
         if(is == null) {
             throw new IllegalArgumentException("is is null");
         }
         
-        if(bytes == null) {
-            throw new IllegalArgumentException("bytes is null");
+        if(buffer == null) {
+            throw new IllegalArgumentException("buffer is null");
         }
         
-        byte[] buffer = new byte[BUFFER_SIZE];
+        if(length < 0) {
+            throw new IllegalArgumentException("length is negative");
+        }   
+        
         int read;
+        int totalRead = 0;
         int offset = 0;
-        while ((read = is.read(buffer)) > 0) {
-            int myread = read;
-            if(offset + myread > bytes.length) {
-                myread = bytes.length - offset;
-            }
-            
-            System.arraycopy(buffer, 0, bytes, offset, myread);
-            offset += myread;
-            
-            if(myread != read) {
-                break;
-            }
+        int remaining = Math.min(length, buffer.length);
+        while ((read = is.read(buffer, offset, remaining)) > 0) {
+            totalRead += read;
+            offset += read;
+            remaining -= read;
         }
-        return offset;
+
+        return totalRead;
     }
     
     public static void writeToFile(byte[] bytes, File file) throws IOException {
