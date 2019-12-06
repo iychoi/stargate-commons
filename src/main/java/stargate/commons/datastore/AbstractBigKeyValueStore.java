@@ -31,9 +31,13 @@ public abstract class AbstractBigKeyValueStore {
     
     public abstract BigKeyValueStoreMetadata getMetadata(String key) throws IOException;
     public abstract InputStream getData(String key) throws IOException;
-    public abstract void put(String key, BigKeyValueStoreMetadata metadata, InputStream dataIS) throws IOException;
-    public abstract boolean putIfAbsent(String key, BigKeyValueStoreMetadata metadata, InputStream dataIS) throws IOException;
-    public abstract boolean replace(String key, BigKeyValueStoreMetadata oldMetadata, BigKeyValueStoreMetadata newMetadata, InputStream dataIS) throws IOException;
+    public abstract void warmData(String key) throws IOException;
+    public abstract void warmData(String key, BigKeyValueStoreMetadata metadata) throws IOException;
+    public abstract InputStream getDataPart(String key, int partNo) throws IOException;
+    public abstract void put(String key, InputStream dataIS, long size, byte[] extra) throws IOException;
+    public abstract boolean putIfAbsent(String key, InputStream dataIS, long size, byte[] extra) throws IOException;
+    public abstract boolean replace(String key, BigKeyValueStoreMetadata oldMetadata, BigKeyValueStoreMetadata newMetadata) throws IOException;
+    
     public abstract void remove(String key) throws IOException;
     
     public abstract String getPrimaryNodeForData(String key) throws IOException;

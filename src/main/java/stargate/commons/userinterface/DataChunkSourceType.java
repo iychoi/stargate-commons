@@ -13,19 +13,32 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.service;
-
-import java.io.IOException;
+package stargate.commons.userinterface;
 
 /**
  *
  * @author iychoi
  */
-public abstract class AbstractService {
+public enum DataChunkSourceType {
+    DATA_CHUNK_SOURCE_LOCAL (0),
+    DATA_CHUNK_SOURCE_REMOTE (1);
     
-    public abstract void start() throws IOException;
-    public abstract void stop() throws IOException;
+    private int numVal;
     
-    public abstract boolean isStarted();
-    public abstract void addPostStartTask(Runnable task);
+    DataChunkSourceType(int numVal) {
+        this.numVal = numVal;
+    }
+    
+    public int getNumVal() {
+        return this.numVal;
+    }
+    
+    public static DataChunkSourceType fromNumVal(int numVal) {
+        for(DataChunkSourceType type : DataChunkSourceType.values()) {
+            if(type.getNumVal() == numVal) {
+                return type;
+            }
+        }
+        return null;
+    }
 }

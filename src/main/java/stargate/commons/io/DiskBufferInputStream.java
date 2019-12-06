@@ -15,12 +15,13 @@
 */
 package stargate.commons.io;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import stargate.commons.utils.IOUtils;
 import stargate.commons.utils.TempFileUtils;
 
@@ -30,17 +31,21 @@ import stargate.commons.utils.TempFileUtils;
  */
 public class DiskBufferInputStream extends InputStream {
 
-    private static final int MAX_BUFFER_SIZE = 4 * 1024 * 1024; // 4MB
-    private static final int DEFAULT_BUFFER_SIZE = 16 * 1024; // 16KB
+    private static final Log LOG = LogFactory.getLog(DiskBufferInputStream.class);
     
+    private static final int BUFFER_SIZE = 32 * 1024; // 32KB
     
     private byte[] buffer;
     private int bufferSize = 0;
     private long bufferStartOffset = 0;
     private long offset = 0;
     private long dataSize = 0;
+    
     private File tempFile;
     private FileInputStream fileInputStream;
+    private DiskBufferInputStreamReader inputStreamReader;
+    private Thread readThread;
+    private InputStream inputStream;
     
     public DiskBufferInputStream(InputStream is, int dataSize) throws IOException {
         if(is == null) {
@@ -54,79 +59,36 @@ public class DiskBufferInputStream extends InputStream {
         initialize(is, dataSize);
     }
     
-    private void initialize(byte[] inputData, int dataSize, boolean copyData) throws IOException {
-        if(dataSize < MAX_BUFFER_SIZE) {
-            // hold all data in memory
-            this.bufferSize = dataSize;
-            if(copyData) {
-                this.buffer = new byte[dataSize];
-                System.arraycopy(inputData, 0, this.buffer, 0, dataSize);
-            } else {
-                this.buffer = inputData;
-            }
-            this.tempFile = null;
-        } else {
-            // use disk
-            this.bufferSize = DEFAULT_BUFFER_SIZE;
-            this.buffer = new byte[this.bufferSize];
-            
-            System.arraycopy(inputData, 0, this.buffer, 0, this.bufferSize);
-            
-            // save to a temp file
-            if(TempFileUtils.makeTempRoot()) {
-                this.tempFile = TempFileUtils.createTempFile("BUFFIS", "SGFS");
-                IOUtils.writeToFile(inputData, this.tempFile);
-                this.fileInputStream = new FileInputStream(this.tempFile);
-            } else {
-                throw new IOException("Failed to create a temp root dir");
-            }
-        }
-        
-        this.bufferStartOffset = 0;
-        this.offset = 0;
-        this.dataSize = dataSize;
-    }
-    
     private void initialize(InputStream is, int dataSize) throws IOException {
-        if(dataSize < MAX_BUFFER_SIZE) {
-            byte[] inputData = IOUtils.toByteArray(is);
+        if(dataSize <= BUFFER_SIZE) {
             // hold all data in memory
             this.bufferSize = dataSize;
-            this.buffer = inputData;
+            this.buffer = IOUtils.toByteArray(is);
+            is.close();
+            
+            this.inputStream = null;
             this.tempFile = null;
+            this.fileInputStream = null;
+            this.inputStreamReader = null;
+            this.readThread = null;
         } else {
             // use disk
-            this.bufferSize = DEFAULT_BUFFER_SIZE;
+            this.bufferSize = BUFFER_SIZE;
             this.buffer = new byte[this.bufferSize];
-            byte[] readBuffer = new byte[this.bufferSize];
             
-            // save to a temp file
+            // create a temp file
             if(!TempFileUtils.makeTempRoot()) {
                 throw new IOException("Failed to create a temp root dir");
             }
-            
             this.tempFile = TempFileUtils.createTempFile("BUFFIS", "SGFS");
+            
             FileOutputStream fos = new FileOutputStream(this.tempFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            this.inputStream = is;
             
-            int read;
-            int offset = 0;
-            int bufferOffset = 0;
-            while ((read = is.read(readBuffer, 0, this.bufferSize)) > 0) {
-                if(bufferOffset < this.bufferSize) {
-                    // load first page
-                    System.arraycopy(this.buffer, bufferOffset, readBuffer, 0, Math.min(read, this.bufferSize - bufferOffset));
-                    bufferOffset += read;
-                }
-                
-                // write to a file
-                bos.write(readBuffer, 0, read);
-                offset += read;
-            }
-            
-            bos.close();
-            
+            this.inputStreamReader = new DiskBufferInputStreamReader(is, fos);
             this.fileInputStream = new FileInputStream(this.tempFile);
+            this.readThread = new Thread(this.inputStreamReader);
+            this.readThread.start();
         }
         
         this.bufferStartOffset = 0;
@@ -140,21 +102,37 @@ public class DiskBufferInputStream extends InputStream {
         }
         
         long newBufferStartOffset = (this.offset / this.bufferSize) * this.bufferSize;
+        int newBufferSize = (int) Math.min(this.dataSize - newBufferStartOffset, this.bufferSize);
+        
         if(this.bufferStartOffset != newBufferStartOffset) {
             this.bufferStartOffset = newBufferStartOffset;
             
             if(this.fileInputStream != null) {
                 // seek
-                this.fileInputStream.getChannel().position(this.bufferStartOffset);
-                
-                this.fileInputStream.read(this.buffer, 0, bufferSize);
+                boolean waitResult = this.inputStreamReader.waitUntil(this.bufferStartOffset, newBufferSize);
+                if(waitResult) {
+                    this.fileInputStream.getChannel().position(this.bufferStartOffset);
+                    int remainder = newBufferSize;
+                    int bufferOffset = 0;
+                    while(remainder > 0) {
+                        int read = this.fileInputStream.read(this.buffer, bufferOffset, remainder);
+                        if(read < 0) {
+                            break;
+                        }
+                        
+                        remainder -= read;
+                        bufferOffset += read;
+                    }
+                } else {
+                    throw new IOException("read from inputstream failed");
+                }
             } else {
-                throw new IOException("RandomAccesFile is null");
+                throw new IOException("fileInputStream is null");
             }
         }
     }
     
-    public synchronized long getPos() throws IOException {
+    public synchronized long getOffset() {
         return this.offset;
     }
     
@@ -276,6 +254,23 @@ public class DiskBufferInputStream extends InputStream {
             } finally {
                 this.fileInputStream = null;
             }
+        }
+        
+        if(this.inputStream != null) {
+            try {
+                this.inputStream.close();
+            } catch (IOException ex) {
+            } finally {
+                this.inputStream = null;
+            }
+        }
+        
+        if(this.readThread != null) {
+            if(this.readThread.isAlive()) {
+                this.readThread.interrupt();
+            }
+            
+            this.readThread = null;
         }
         
         if(this.tempFile != null) {

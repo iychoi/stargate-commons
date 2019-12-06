@@ -54,6 +54,9 @@ public class BigKeyValueStoreMetadata {
         return (BigKeyValueStoreMetadata) JsonSerializer.fromJson(json, BigKeyValueStoreMetadata.class);
     }
     
+    BigKeyValueStoreMetadata() {
+    }
+    
     public BigKeyValueStoreMetadata(String key) {
         if(key == null || key.isEmpty()) {
             throw new IllegalArgumentException("key is null or empty");
@@ -110,7 +113,7 @@ public class BigKeyValueStoreMetadata {
         this.entrySize = entrySize;
         this.extra = null;
     }
-    
+
     @JsonProperty("key")
     public String getKey() {
         return this.key;

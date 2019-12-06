@@ -24,6 +24,8 @@ import stargate.commons.driver.DriverNotInitializedException;
  * @author iychoi
  */
 public abstract class AbstractDataStoreDriver extends AbstractDriver {
+    public abstract int getPartSize();
+    
     public abstract AbstractKeyValueStore getKeyValueStore(String name, Class valueClass, DataStoreProperties properties) throws IOException, DriverNotInitializedException;
     public abstract AbstractBigKeyValueStore getBigKeyValueStore(String name, DataStoreProperties properties) throws IOException, DriverNotInitializedException;
     public abstract AbstractQueue getQueue(String name, Class valueClass, DataStoreProperties properties) throws IOException, DriverNotInitializedException;

@@ -30,6 +30,7 @@ public class FSServiceInfo {
     
     private int chunkSize;
     private String hashAlgorithm;
+    private int partSize;
     
     public static FSServiceInfo createInstance(File file) throws IOException {
         if(file == null) {
@@ -50,7 +51,7 @@ public class FSServiceInfo {
     FSServiceInfo() {
     }
     
-    public FSServiceInfo(int chunkSize, String hashAlgorithm) {
+    public FSServiceInfo(int chunkSize, String hashAlgorithm, int partSize) {
         if(chunkSize < 0) {
             throw new IllegalArgumentException("chunkSize is negative");
         }
@@ -59,8 +60,13 @@ public class FSServiceInfo {
             throw new IllegalArgumentException("hashAlgorithm is null or empty");
         }
         
+        if(partSize < 0) {
+            throw new IllegalArgumentException("partSize is negative");
+        }
+        
         this.chunkSize = chunkSize;
         this.hashAlgorithm = hashAlgorithm;
+        this.partSize = partSize;
     }
 
     @JsonProperty("chunk_size")
@@ -91,10 +97,24 @@ public class FSServiceInfo {
         this.hashAlgorithm = hashAlgorithm;
     }
     
+    @JsonProperty("part_size")
+    public int getPartSize() {
+        return this.partSize;
+    }
+    
+    @JsonProperty("part_size")
+    public void setPartSize(int partSize) {
+        if(partSize < 0) {
+            throw new IllegalArgumentException("partSize must not be negative");
+        }
+        
+        this.partSize = partSize;
+    }
+    
     @Override
     @JsonIgnore
     public String toString() {
-        return this.hashAlgorithm + "/" + this.chunkSize;
+        return this.hashAlgorithm + "/" + this.chunkSize + "/" + this.partSize;
     }
     
     @JsonIgnore

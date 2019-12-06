@@ -120,6 +120,11 @@ public class StargateEvent {
         return Collections.unmodifiableCollection(this.receiverNodeNames);
     }
     
+    @JsonIgnore
+    public int getReceiverNodeCount() {
+        return this.receiverNodeNames.size();
+    }
+    
     @JsonProperty("receiver_node_names")
     public void addReceiverNodeNames(Collection<String> receiverNodeNames) {
         if(receiverNodeNames == null) {

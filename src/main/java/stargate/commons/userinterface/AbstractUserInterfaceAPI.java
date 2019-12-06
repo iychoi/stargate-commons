@@ -70,6 +70,8 @@ public abstract class AbstractUserInterfaceAPI {
     public abstract void syncRecipes() throws IOException;
     
     public abstract InputStream getDataChunk(DataObjectURI uri, String hash) throws IOException;
+    public abstract DataChunkStatus initDataChunkPart(DataObjectURI uri, String hash) throws IOException;
+    public abstract InputStream getDataChunkPart(DataObjectURI uri, String hash, int partNo) throws IOException;
     
     public abstract TransferAssignment schedulePrefetch(DataObjectURI uri, String hash) throws IOException;
     public abstract Recipe getRemoteRecipeWithTransferSchedule(DataObjectURI uri) throws IOException;
