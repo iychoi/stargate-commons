@@ -74,7 +74,7 @@ public class Cluster {
         initialize(name, nodes);
     }
     
-    private void initialize(String name, Collection<Node> nodes) {
+    private synchronized void initialize(String name, Collection<Node> nodes) {
         this.name = name;
         
         if(nodes != null) {
@@ -83,12 +83,12 @@ public class Cluster {
     }
     
     @JsonProperty("name")
-    public String getName() {
+    public synchronized String getName() {
         return this.name;
     }
     
     @JsonProperty("name")
-    public void setName(String name) {
+    public synchronized void setName(String name) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -97,17 +97,17 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public int getNodeNum() {
+    public synchronized int getNodeNum() {
         return this.nodes.size();
     }
     
     @JsonProperty("nodes")
-    public Collection<Node> getNodes() {
+    public synchronized Collection<Node> getNodes() {
         return Collections.unmodifiableCollection(this.nodes.values());
     }
     
     @JsonIgnore
-    public Collection<String> getNodeNames() {
+    public synchronized Collection<String> getNodeNames() {
         List<String> nodeNames = new ArrayList<String>();
         for(Node node : this.nodes.values()) {
             nodeNames.add(node.getName());
@@ -116,7 +116,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public Collection<Node> getLiveNodes() throws IOException {
+    public synchronized Collection<Node> getLiveNodes() throws IOException {
         List<Node> liveNodes = new ArrayList<Node>();
         for(Node node : this.nodes.values()) {
             NodeStatus status = node.getStatus();
@@ -130,7 +130,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public Collection<Node> getDataNodes() throws IOException {
+    public synchronized Collection<Node> getDataNodes() throws IOException {
         List<Node> dataNodes = new ArrayList<Node>();
         for(Node node : this.nodes.values()) {
             if(node.isDataNode()) {
@@ -142,7 +142,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public Collection<String> getDataNodeNames() throws IOException {
+    public synchronized Collection<String> getDataNodeNames() throws IOException {
         List<String> dataNodeNames = new ArrayList<String>();
         for(Node node : this.nodes.values()) {
             if(node.isDataNode()) {
@@ -154,7 +154,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public Collection<Node> getNonDataNodes() throws IOException {
+    public synchronized Collection<Node> getNonDataNodes() throws IOException {
         List<Node> nonDataNodes = new ArrayList<Node>();
         for(Node node : this.nodes.values()) {
             if(!node.isDataNode()) {
@@ -166,7 +166,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public Collection<String> getNonDataNodeNames() throws IOException {
+    public synchronized Collection<String> getNonDataNodeNames() throws IOException {
         List<String> nonDataNodeNames = new ArrayList<String>();
         for(Node node : this.nodes.values()) {
             if(!node.isDataNode()) {
@@ -178,16 +178,16 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public Node getNode(String nodeName) {
+    public synchronized Node getNode(String nodeName) {
         if(nodeName == null || nodeName.isEmpty()) {
             throw new IllegalArgumentException("nodeName is null or empty");
         }
         
-        return (Node) this.nodes.get(nodeName);
+        return this.nodes.get(nodeName);
     }
     
     @JsonProperty("nodes")
-    public void addOrUpdateNodes(Collection<Node> nodes) {
+    public synchronized void addOrUpdateNodes(Collection<Node> nodes) {
         if(nodes == null) {
             throw new IllegalArgumentException("nodes is null");
         }
@@ -198,7 +198,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public void addOrUpdateNodes(Collection<Node> nodes, boolean update) {
+    public synchronized void addOrUpdateNodes(Collection<Node> nodes, boolean update) {
         if(nodes == null) {
             throw new IllegalArgumentException("nodes is null");
         }
@@ -209,7 +209,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public void addOrUpdateNode(Node node, boolean update) {
+    public synchronized void addOrUpdateNode(Node node, boolean update) {
         if(node == null) {
             throw new IllegalArgumentException("node is null");
         }
@@ -225,12 +225,12 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public void clearNodes() {
+    public synchronized void clearNodes() {
         this.nodes.clear();
     }
     
     @JsonIgnore
-    public void clearNodes(boolean update) {
+    public synchronized void clearNodes(boolean update) {
         this.nodes.clear();
         
         if(update) {
@@ -239,7 +239,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public boolean removeNode(Node node) {
+    public synchronized boolean removeNode(Node node) {
         if(node == null) {
             throw new IllegalArgumentException("node is null");
         }
@@ -249,7 +249,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public boolean removeNode(Node node, boolean update) {
+    public synchronized boolean removeNode(Node node, boolean update) {
         if(node == null) {
             throw new IllegalArgumentException("node is null");
         }
@@ -264,7 +264,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public boolean removeNode(String nodeName) {
+    public synchronized boolean removeNode(String nodeName) {
         if(nodeName == null || nodeName.isEmpty()) {
             throw new IllegalArgumentException("nodeName is null or empty");
         }
@@ -274,7 +274,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public boolean removeNode(String nodeName, boolean update) {
+    public synchronized boolean removeNode(String nodeName, boolean update) {
         if(nodeName == null || nodeName.isEmpty()) {
             throw new IllegalArgumentException("nodeName is null or empty");
         }
@@ -289,7 +289,7 @@ public class Cluster {
     }
     
     @JsonIgnore
-    public boolean hasNode(String nodeName) {
+    public synchronized boolean hasNode(String nodeName) {
         if(nodeName == null || nodeName.isEmpty()) {
             throw new IllegalArgumentException("nodeName is null or empty");
         }
@@ -298,12 +298,12 @@ public class Cluster {
     }
     
     @JsonProperty("last_update_time")
-    public long getLastUpdateTime() {
+    public synchronized long getLastUpdateTime() {
         return this.lastUpdateTime;
     }
     
     @JsonProperty("last_update_time")
-    public void setLastUpdateTime(long time) {
+    public synchronized void setLastUpdateTime(long time) {
         if(time < 0) {
             throw new IllegalArgumentException("time is negative");
         }
@@ -313,13 +313,13 @@ public class Cluster {
     
     @Override
     @JsonIgnore
-    public String toString() {
+    public synchronized String toString() {
         return this.name;
     }
     
     @Override
     @JsonIgnore
-    public int hashCode() {
+    public synchronized int hashCode() {
         int hash = 5;
         hash = 89 * hash + Objects.hashCode(this.name);
         return hash;
@@ -327,7 +327,7 @@ public class Cluster {
 
     @Override
     @JsonIgnore
-    public boolean equals(Object obj) {
+    public synchronized boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

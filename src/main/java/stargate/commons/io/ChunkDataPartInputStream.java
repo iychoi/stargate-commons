@@ -15,23 +15,23 @@
 */
 package stargate.commons.io;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import stargate.commons.utils.IOUtils;
+import stargate.commons.datastore.BigKeyValueStoreUtils;
 
 /**
  *
  * @author iychoi
  */
-public class ChunkDataPartInputStream extends InputStream implements Closeable {
+public class ChunkDataPartInputStream extends AbstractSeekableInputStream {
 
-    private byte[] chunkData;
-    private int offset;
+    private AbstractSeekableInputStream inputStream;
     private long chunkStartOffset;
     private int chunkSize;
-    private int chunkPartNo;
-    private int chunkPartSize;
+    private int partSize;
+    private int partNo;
+    private long partStartOffsetInChunk;
+    private int actualPartSize;
     
     public ChunkDataPartInputStream(InputStream is, long chunkStartOffset, int chunkSize, int chunkPartNo, int chunkPartSize) throws IOException {
         if(is == null) {
@@ -54,47 +54,48 @@ public class ChunkDataPartInputStream extends InputStream implements Closeable {
             throw new IllegalArgumentException("chunkPartSize is negative");
         }
         
-        this.chunkData = IOUtils.toByteArray(is, chunkPartSize);
-        is.close();
+        if(is instanceof AbstractSeekableInputStream) {
+            this.inputStream = (AbstractSeekableInputStream) is;
+        } else {
+            this.inputStream = new DiskBufferInputStream(is, chunkSize);
+        }
+        
         this.chunkStartOffset = chunkStartOffset;
         this.chunkSize = chunkSize;
-        this.chunkPartNo = chunkPartNo;
-        this.chunkPartSize = chunkPartSize;
-        this.offset = 0;
-    }
-
-    public int getOffset() {
-        return this.offset;
+        this.partNo = chunkPartNo;
+        this.partSize = chunkPartSize;
+        
+        this.partStartOffsetInChunk = BigKeyValueStoreUtils.getPartStartOffset(this.partSize, this.partNo);
+        this.actualPartSize = BigKeyValueStoreUtils.getPartSize(this.chunkSize, this.partSize, this.partNo);
     }
     
     public long getChunkStartOffset() {
         return this.chunkStartOffset;
+    }
+    
+    public long getPartStartOffsetInChunk() {
+        return this.partStartOffsetInChunk;
     }
 
     public int getChunkSize() {
         return this.chunkSize;
     }
     
-    public long getChunkPartStartOffset() {
-        return this.chunkStartOffset + (this.chunkPartSize * this.chunkPartNo);
-    }
-    
-    public int getChunkPartSizeActual() {
-        return Math.min(this.chunkSize - (this.chunkPartSize * this.chunkPartNo), this.chunkPartSize);
-    }
-    
     public int getChunkPartNo() {
-        return this.chunkPartNo;
+        return this.partNo;
     }
     
     public int getChunkPartSize() {
-        return this.chunkPartSize;
+        return this.partSize;
+    }
+    
+    public int getActualChunkPartSize() {
+        return this.actualPartSize;
     }
 
     public boolean containsOffset(long offset) {
-        if (this.chunkStartOffset + (this.chunkPartSize * this.chunkPartNo) <= offset &&
-            (this.chunkStartOffset + this.chunkSize) > offset &&
-                this.chunkStartOffset + (this.chunkPartSize * this.chunkPartNo) + this.chunkPartSize > offset) {
+        if (this.chunkStartOffset + this.partStartOffsetInChunk <= offset &&
+            (this.chunkStartOffset + this.partStartOffsetInChunk + this.partSize) > offset) {
             return true;
         }
         return false;
@@ -102,79 +103,45 @@ public class ChunkDataPartInputStream extends InputStream implements Closeable {
     
     @Override
     public synchronized int read() throws IOException {
-        if(this.offset >= this.chunkData.length) {
-            return -1;
+        return this.inputStream.read();
         }
         
-        int read = this.chunkData[this.offset];
-        this.offset++;
-        return read;
-    }
-    
     @Override
     public synchronized int read(byte[] bytes, int off, int len) throws IOException {
-        if(bytes == null) {
-            throw new IOException("bytes is null");
+        return this.inputStream.read(bytes, off, len);
         }
         
-        if(off < 0) {
-            throw new IOException("off is negative");
-        }
-        
-        if(len < 0) {
-            throw new IOException("len is negative");
-        }
-        
-        if(this.offset >= this.chunkData.length) {
-            return -1;
-        }
-        
-        int readLen = Math.min(len, this.chunkData.length - this.offset);
-        System.arraycopy(this.chunkData, this.offset, bytes, off, readLen);
-        return readLen;
-    }
-    
     @Override
-    public synchronized int read(byte[] bytes) throws IOException {
-        if(bytes == null) {
-            throw new IOException("bytes is null");
+    public synchronized int read(byte bytes[]) throws IOException {
+        return this.inputStream.read(bytes);
         }
         
-        return read(bytes, 0, bytes.length);
-    }
-    
     @Override
     public synchronized long skip(long skip) throws IOException {
-        if(this.offset >= this.chunkData.length) {
-            return 0;
-        }
-        
-        if(skip < 0) {
-            throw new IOException("cannot skip to negative");
-        }
-        
-        int skippable = (int) Math.min(this.chunkData.length - this.offset, skip);
-        this.offset += skippable;
-        return skippable;
+        return this.inputStream.skip(skip);
     }
-    
+
+    @Override
+    public long getOffset() throws IOException {
+        return this.inputStream.getOffset();
+    }
+
+    @Override
     public synchronized void seek(long offset) throws IOException {
-        if(offset < 0) {
-            throw new IOException("cannot seek to negative");
-        }
-        
-        int seekable = (int) Math.min(this.chunkData.length, offset);
-        this.offset = seekable;
+        this.inputStream.seek(offset);
     }
     
     @Override
     public synchronized int available() throws IOException {
-        return this.chunkData.length - this.offset;
+        return this.inputStream.available();
     }
 
     @Override
     public synchronized void close() throws IOException {
-        this.chunkData = null;
+        if(this.inputStream != null) {
+            this.inputStream.close();
+            this.inputStream = null;
+        }
     }
 
     @Override

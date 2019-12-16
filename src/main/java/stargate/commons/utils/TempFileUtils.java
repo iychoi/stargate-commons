@@ -36,6 +36,8 @@ public class TempFileUtils {
         
         File f = new File(getTempRoot(), name);
         f.createNewFile();
+        f.setReadable(true, false);
+        f.setWritable(true, false);
         f.deleteOnExit();
         return f;
     }
@@ -44,6 +46,8 @@ public class TempFileUtils {
         // prefix and extension can be null
         
         File f = File.createTempFile(prefix, extension, getTempRoot());
+        f.setReadable(true, false);
+        f.setWritable(true, false);
         f.deleteOnExit();
         return f;
     }
@@ -56,11 +60,17 @@ public class TempFileUtils {
         File f = new File(getTempRoot(), name);
         f.deleteOnExit();
         f.mkdirs();
+        f.setReadable(true, false);
+        f.setWritable(true, false);
         return f;
     }
     
     public static boolean makeTempRoot() {
-        return DirUtils.makeDir(getTempRoot());
+        File tempRoot = getTempRoot();
+        boolean makeDir = DirUtils.makeDir(tempRoot);
+        tempRoot.setReadable(true, false);
+        tempRoot.setWritable(true, false);
+        return makeDir;
     }
     
     public static void clearTempRoot() {

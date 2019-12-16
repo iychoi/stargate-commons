@@ -13,32 +13,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package stargate.commons.userinterface;
+package stargate.commons.io;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
  * @author iychoi
  */
-public enum DataChunkSourceType {
-    DATA_CHUNK_SOURCE_LOCAL (0),
-    DATA_CHUNK_SOURCE_REMOTE (1);
-    
-    private int numVal;
-    
-    DataChunkSourceType(int numVal) {
-        this.numVal = numVal;
-    }
-    
-    public int getNumVal() {
-        return this.numVal;
-    }
-    
-    public static DataChunkSourceType fromNumVal(int numVal) {
-        for(DataChunkSourceType type : DataChunkSourceType.values()) {
-            if(type.getNumVal() == numVal) {
-                return type;
-            }
-        }
-        return null;
-    }
+public abstract class AbstractSeekableInputStream extends InputStream {
+    public abstract long getOffset() throws IOException;
+    public abstract void seek(long offset) throws IOException;
 }

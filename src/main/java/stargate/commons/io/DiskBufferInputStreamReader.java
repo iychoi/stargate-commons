@@ -36,7 +36,7 @@ public class DiskBufferInputStreamReader implements Runnable {
     private OutputStream outputStream;
     private long offset;
     private Object notifyObject = new Object();
-    private long notifyOffset;
+    private long notifySize;
     private int bufferSize = BUFFER_SIZE;
     private boolean done;
     
@@ -56,7 +56,7 @@ public class DiskBufferInputStreamReader implements Runnable {
         this.inputStream = is;
         this.outputStream = os;
         this.offset = 0;
-        this.notifyOffset = 0;
+        this.notifySize = -1;
         this.bufferSize = bufferSize;
         this.done = false;
     }
@@ -73,7 +73,7 @@ public class DiskBufferInputStreamReader implements Runnable {
         this.inputStream = is;
         this.outputStream = os;
         this.offset = 0;
-        this.notifyOffset = 0;
+        this.notifySize = 0;
         this.done = false;
     }
     
@@ -85,38 +85,41 @@ public class DiskBufferInputStreamReader implements Runnable {
         return this.done;
     }
     
-    public boolean waitUntil(long offset, int size) {
-        if(this.offset >= offset + size) {
-            return true;
-        }
-        
-        if(this.done) {
-            return false;
+    public void waitUntil(long size) throws IOException {
+        synchronized(this.notifyObject) {
+            if(this.offset >= size) {
+                return;
+            }
+
+            if(this.done) {
+                throw new IOException(String.format("cannot wait size %d (offset %d) - stream is already closed", size, this.offset));
+            }
         }
         
         try {
-            this.notifyOffset = offset + size;
-            
-            while(this.offset < offset + size) {
-                synchronized(this.notifyObject) {
+            synchronized(this.notifyObject) {
+                this.notifySize = size;
+                
+                while(this.offset < size) {
                     this.notifyObject.wait(3000);
-                }
-                
-                if(this.offset >= offset + size) {
-                    return true;
-                }
-                
-                if(this.done) {
-                    return false;
+                    
+                    if(this.offset >= size) {
+                        this.notifySize = -1;
+                        return;
+                    }
+
+                    if(this.done) {
+                        throw new IOException(String.format("cannot finish waiting size %d (offset %d) - stream is closed", size, this.offset));
+                    }
                 }
             }
             
-            return true;
+            return;
         } catch (InterruptedException ex) {
-            if(this.offset >= offset + size) {
-                return true;
+            if(this.offset >= size) {
+                return;
             }
-            return false;
+            throw new IOException(ex);
         }
     }
     
@@ -126,20 +129,20 @@ public class DiskBufferInputStreamReader implements Runnable {
            return; 
         }
         
-        int read;
+        int readLen;
         try {
             byte[] buffer = new byte[this.bufferSize];
     
-            while((read = this.inputStream.read(buffer, 0, this.bufferSize)) >= 0) {
-                this.outputStream.write(buffer, 0, read);
+            while((readLen = this.inputStream.read(buffer, 0, this.bufferSize)) >= 0) {
+                this.outputStream.write(buffer, 0, readLen);
                 this.outputStream.flush();
+             
+                this.offset += readLen;
                 
-                this.offset += read;
-                if(this.notifyOffset > 0) {
-                    if(this.notifyOffset <= this.offset) {
-                        synchronized(this.notifyObject) {
-                            this.notifyObject.notifyAll();
-                        }
+                synchronized(this.notifyObject) {
+                    if(this.notifySize >= 0 && this.notifySize <= this.offset) {
+                        this.notifyObject.notifyAll();
+                        this.notifySize = -1;
                     }
                 }
             }

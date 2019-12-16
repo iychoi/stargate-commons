@@ -15,9 +15,11 @@
 */
 package stargate.commons.datastore;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import stargate.commons.io.AbstractSeekableInputStream;
 
 /**
  *
@@ -26,14 +28,15 @@ import java.util.Collection;
 public abstract class AbstractBigKeyValueStore {
     public abstract String getName();
     public abstract DataStoreProperties getProperties();
+    public abstract int getPartSize();
     
     public abstract boolean containsKey(String key);
     
     public abstract BigKeyValueStoreMetadata getMetadata(String key) throws IOException;
-    public abstract InputStream getData(String key) throws IOException;
+    public abstract AbstractSeekableInputStream getData(String key) throws IOException;
     public abstract void warmData(String key) throws IOException;
     public abstract void warmData(String key, BigKeyValueStoreMetadata metadata) throws IOException;
-    public abstract InputStream getDataPart(String key, int partNo) throws IOException;
+    public abstract AbstractSeekableInputStream getDataPart(String key, int partNo) throws IOException;
     public abstract void put(String key, InputStream dataIS, long size, byte[] extra) throws IOException;
     public abstract boolean putIfAbsent(String key, InputStream dataIS, long size, byte[] extra) throws IOException;
     public abstract boolean replace(String key, BigKeyValueStoreMetadata oldMetadata, BigKeyValueStoreMetadata newMetadata) throws IOException;
@@ -41,6 +44,8 @@ public abstract class AbstractBigKeyValueStore {
     public abstract void remove(String key) throws IOException;
     
     public abstract String getPrimaryNodeForData(String key) throws IOException;
+    public abstract boolean isPrimaryNodeForDataLocal(String key) throws IOException;
+    public abstract File getCacheFilePath(String key) throws IOException;
     public abstract Collection<String> getBackupNodesForData(String key) throws IOException;
     public abstract Collection<String> getPrimaryAndBackupNodesForData(String key) throws IOException;
     

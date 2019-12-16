@@ -214,6 +214,7 @@ public class Recipe {
         List<String> names = new ArrayList<String>();
         for(int id : nodeIDs) {
             if(id == RecipeChunk.NODE_ID_ALL_NODES) {
+                names.clear();
                 names.addAll(this.nodeNames);
                 break;
             } else {

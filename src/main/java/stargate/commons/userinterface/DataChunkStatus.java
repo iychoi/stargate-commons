@@ -27,7 +27,11 @@ import stargate.commons.utils.JsonSerializer;
  */
 public class DataChunkStatus {
     
-    private DataChunkSourceType sourceType;
+    private DataChunkSource source;
+    private int chunkSize;
+    private int partSize;
+    private String cacheNodeName;
+    private File localCacheFilePath;
     
     public static DataChunkStatus createInstance(File file) throws IOException {
         if(file == null) {
@@ -48,31 +52,99 @@ public class DataChunkStatus {
     DataChunkStatus() {
     }
     
-    public DataChunkStatus(DataChunkSourceType sourceType) {
-        if(sourceType == null) {
-            throw new IllegalArgumentException("sourceType is null");
+    public DataChunkStatus(DataChunkSource source, int chunkSize, int partSize, String cacheNodeName, File localCacheFilePath) {
+        if(source == null) {
+            throw new IllegalArgumentException("source is null");
         }
         
-        this.sourceType = sourceType;
+        if(chunkSize < 0) {
+            throw new IllegalArgumentException("chunkSize is negative");
+        }
+        
+        if(partSize < 0) {
+            throw new IllegalArgumentException("partSize is negative");
+        }
+//        
+//        if(cacheNodeName == null || cacheNodeName.isEmpty()) {
+//            throw new IllegalArgumentException("cacheNodeName is null or empty");
+//        }
+//        
+//        if(localCacheFilePath == null) {
+//            throw new IllegalArgumentException("localCacheFilePath is null");
+//        }
+        
+        this.source = source;
+        this.chunkSize = chunkSize;
+        this.partSize = partSize;
+        this.cacheNodeName = cacheNodeName;
+        this.localCacheFilePath = localCacheFilePath;
     }
     
-    @JsonProperty("source_type")
-    public DataChunkSourceType getSourceType() {
-        return sourceType;
+    @JsonProperty("source")
+    public DataChunkSource getSource() {
+        return this.source;
     }
 
-    @JsonProperty("source_type")
-    public void setSourceURI(DataChunkSourceType sourceType) {
-        if(sourceType == null) {
-            throw new IllegalArgumentException("sourceType is null");
+    @JsonProperty("source")
+    public void setSource(DataChunkSource source) {
+        if(source == null) {
+            throw new IllegalArgumentException("source is null");
         }
         
-        this.sourceType = sourceType;
+        this.source = source;
+    }
+    
+    @JsonProperty("chunk_size")
+    public int getChunkSize() {
+        return this.chunkSize;
+    }
+
+    @JsonProperty("chunk_size")
+    public void setChunkSize(int chunkSize) {
+        if(chunkSize < 0) {
+            throw new IllegalArgumentException("chunkSize is negative");
+        }
+        
+        this.chunkSize = chunkSize;
+    }
+    
+    @JsonProperty("part_size")
+    public int getPartSize() {
+        return this.partSize;
+    }
+
+    @JsonProperty("part_size")
+    public void setPartSize(int partSize) {
+        if(partSize < 0) {
+            throw new IllegalArgumentException("partSize is negative");
+        }
+        
+        this.partSize = partSize;
+    }
+    
+    @JsonProperty("cache_nodename")
+    public String getCacheNodeName() {
+        return this.cacheNodeName;
+    }
+
+    @JsonProperty("cache_nodename")
+    public void setCacheNodeName(String cacheNodeName) {
+        this.cacheNodeName = cacheNodeName;
+    }
+    
+    @JsonProperty("local_cache_path")
+    public File getLocalCachePath() {
+        return this.localCacheFilePath;
+    }
+
+    @JsonProperty("local_cache_path")
+    public void setLocalCachePath(File localCachePath) {
+        this.localCacheFilePath = localCachePath;
     }
     
     @Override
     public String toString() {
-        return String.format("%s", this.sourceType.toString());
+        return String.format("%s", this.source.toString());
     }
     
     @JsonIgnore

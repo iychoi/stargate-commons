@@ -131,7 +131,8 @@ public class IOUtils {
             throw new IllegalArgumentException("file is null");
         }
         
-        FileOutputStream fos = new FileOutputStream(file);
+        FileOutputStream fos = new FileOutputStream(file, true);
+        fos.getChannel().truncate(0);
         fos.write(bytes);
         fos.close();
     }

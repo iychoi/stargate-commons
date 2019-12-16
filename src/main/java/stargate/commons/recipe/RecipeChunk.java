@@ -17,10 +17,10 @@ package stargate.commons.recipe;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import stargate.commons.utils.JsonSerializer;
@@ -39,7 +39,7 @@ public class RecipeChunk {
     private String hash;
     // IDs of nodes that have the chunks
     // we can find names of the nodes from the Recipe instance.
-    private Set<Integer> nodeIDs = new HashSet<Integer>();
+    private List<Integer> nodeIDs = new ArrayList<Integer>();
     
     public static RecipeChunk createInstance(File file) throws IOException {
         if(file == null) {
@@ -239,7 +239,9 @@ public class RecipeChunk {
             throw new IllegalArgumentException("nodeID is negative");
         }
         
-        this.nodeIDs.add(nodeID);
+        if(!this.nodeIDs.contains(new Integer(nodeID))) {
+            this.nodeIDs.add(nodeID);
+        }
     }
     
     @JsonIgnore

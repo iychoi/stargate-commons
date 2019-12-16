@@ -15,7 +15,6 @@
 */
 package stargate.commons.io;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -23,9 +22,9 @@ import java.io.InputStream;
  *
  * @author iychoi
  */
-public class ChunkDataInputStream extends InputStream implements Closeable {
+public class ChunkDataInputStream extends AbstractSeekableInputStream {
 
-    private DiskBufferInputStream inputStream;
+    private AbstractSeekableInputStream inputStream;
     private long chunkStartOffset;
     private int chunkSize;
     
@@ -42,19 +41,16 @@ public class ChunkDataInputStream extends InputStream implements Closeable {
             throw new IllegalArgumentException("chunkSize is negative");
         }
         
-        this.inputStream = new DiskBufferInputStream(is, chunkSize);
+        if(is instanceof AbstractSeekableInputStream) {
+            this.inputStream = (AbstractSeekableInputStream) is;
+        } else {
+            this.inputStream = new DiskBufferInputStream(is, chunkSize);
+        }
+        
         this.chunkStartOffset = chunkStartOffset;
         this.chunkSize = chunkSize;
     }
 
-    public DiskBufferInputStream getDiskBufferInputStream() {
-        return this.inputStream;
-    }
-    
-    public int getOffset() {
-        return (int) this.inputStream.getOffset();
-    }
-    
     public long getChunkStartOffset() {
         return this.chunkStartOffset;
     }
@@ -91,6 +87,12 @@ public class ChunkDataInputStream extends InputStream implements Closeable {
         return this.inputStream.skip(skip);
     }
     
+    @Override
+    public long getOffset() throws IOException {
+        return this.inputStream.getOffset();
+    }
+    
+    @Override
     public synchronized void seek(long offset) throws IOException {
         this.inputStream.seek(offset);
     }
