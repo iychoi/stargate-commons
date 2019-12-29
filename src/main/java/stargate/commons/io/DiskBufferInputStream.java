@@ -58,6 +58,7 @@ public class DiskBufferInputStream extends AbstractSeekableInputStream {
         if(!TempFileUtils.makeTempRoot()) {
             throw new IOException("Failed to create a temp root dir");
         }
+        
         this.tempFile = TempFileUtils.createTempFile("BUFFIS", "SGFS");
 
         FileOutputStream fos = new FileOutputStream(this.tempFile, true);
@@ -197,7 +198,7 @@ public class DiskBufferInputStream extends AbstractSeekableInputStream {
         if(this.fileInputStream != null) {
             try {
                 this.fileInputStream.close();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
             } finally {
                 this.fileInputStream = null;
             }
@@ -206,7 +207,7 @@ public class DiskBufferInputStream extends AbstractSeekableInputStream {
         if(this.inputStream != null) {
             try {
                 this.inputStream.close();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
             } finally {
                 this.inputStream = null;
             }
