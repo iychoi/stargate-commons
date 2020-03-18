@@ -294,27 +294,38 @@ public class Recipe {
             throw new IllegalArgumentException("offset is negative");
         }
         
-        if(this.chunkSize != 0) {
-            int idx = (int) (offset / this.chunkSize);
-            if(this.chunks.size() > idx) {
-                RecipeChunk chunk = this.chunks.get(idx);
-                if(chunk.getOffset() <= offset &&
-                    chunk.getOffset() + chunk.getLength() > offset) {
-                    return chunk;
-                }
-            }
-        }
+        //if(this.chunkSize != 0) {
+        //    int idx = (int) (offset / this.chunkSize);
+        //    if(this.chunks.size() > idx) {
+        //        RecipeChunk chunk = this.chunks.get(idx);
+        //        if(chunk.getOffset() <= offset &&
+        //            chunk.getOffset() + chunk.getLength() > offset) {
+        //            return chunk;
+        //        }
+        //    }
+        //}
             
         // if chunks are not in order, so we could not find the chunk, 
         // iterate through all chunks
+        RecipeChunk chunkFound = null;
         for(RecipeChunk chunk : this.chunks) {
             if(chunk.getOffset() <= offset &&
                     chunk.getOffset() + chunk.getLength() > offset) {
-                return chunk;
+                if(chunkFound != null) {
+                    if(chunkFound.getOffset() < chunk.getOffset()) {
+                        chunkFound = chunk;
+                    }
+                } else {
+                    chunkFound = chunk;
+                }
             }
         }
         
-        throw new IOException(String.format("Cound not find a chunk for an offset : %d", offset));
+        if(chunkFound != null) {
+            return chunkFound;
+        } else {
+            throw new IOException(String.format("Cound not find a chunk for an offset : %d", offset));
+        }
     }
     
     @JsonProperty("chunks")

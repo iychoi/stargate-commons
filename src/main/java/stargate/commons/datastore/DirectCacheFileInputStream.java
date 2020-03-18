@@ -15,10 +15,19 @@
 */
 package stargate.commons.datastore;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import stargate.commons.io.AbstractSeekableInputStream;
@@ -34,14 +43,15 @@ public class DirectCacheFileInputStream extends AbstractSeekableInputStream {
     
     private static final int WAIT_TIMEOUT_SEC = 300;
     private static final int POLLING_INTERVAL_MSEC = 100;
+    private static final int BUFFER_SIZE = 32 * 1024;
     
     private long beginOffset;
     private long offset;
     private long size;
     private File cacheFile;
     private long lastCacheFileLength;
-    private FileInputStream cacheInputStream;
-        
+    private BufferedInputStream cacheInputStream;
+    
     public DirectCacheFileInputStream(File cacheFile, long beginOffset, int size) throws IOException {
         if(cacheFile == null) {
             throw new IllegalArgumentException("cacheFile is null");
@@ -70,10 +80,12 @@ public class DirectCacheFileInputStream extends AbstractSeekableInputStream {
             waitData(this.beginOffset);
             
             try {
-                this.cacheInputStream = new FileInputStream(this.cacheFile);
+                FileInputStream is = new FileInputStream(this.cacheFile);
                 if(this.beginOffset > 0) {
-                    this.cacheInputStream.getChannel().position(this.beginOffset);
+                    is.getChannel().position(this.beginOffset);
                 }
+                this.cacheInputStream = new BufferedInputStream(is, BUFFER_SIZE);
+                
             } catch (FileNotFoundException ex) {
                 LOG.error(ex);
                 throw new IOException(ex);
@@ -91,24 +103,89 @@ public class DirectCacheFileInputStream extends AbstractSeekableInputStream {
         
         // check file existance
         if(this.lastCacheFileLength < 0) {
-            while(!this.cacheFile.exists()) {
-                if(DateTimeUtils.timeElapsedSec(beginTime, curTime, WAIT_TIMEOUT_SEC)) {
-                    // timeout
-                    LOG.error("Timeout occurred while waiting data");
-                    throw new IOException(String.format("cannot open data after %d sec waiting", WAIT_TIMEOUT_SEC));
-                } else {
-                    LOG.info("Wait data");
+            if(!this.cacheFile.exists()) {
+                WatchService fsWatcher = FileSystems.getDefault().newWatchService();
+                boolean created = false;
+                
+                Path dir = Paths.get(this.cacheFile.getParentFile().toURI());
+                dir.register(fsWatcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+                
+                while(true) {
+                    WatchKey key;
                     try {
-                        Thread.sleep(POLLING_INTERVAL_MSEC);
+                        key = fsWatcher.poll(5, TimeUnit.SECONDS);
+                        
+                        curTime = DateTimeUtils.getTimestamp();
+                        if(DateTimeUtils.timeElapsedSec(beginTime, curTime, WAIT_TIMEOUT_SEC)) {
+                            LOG.error(String.format("Timeout occurred while waiting data - %s", this.cacheFile.toString()));
+                            
+                            if(!this.cacheFile.exists()) {
+                                LOG.error(String.format("File does not exist - %s", this.cacheFile.toString()));
+                            }
+                            
+                            if(!this.cacheFile.isFile()) {
+                                LOG.error(String.format("File is not a file - %s", this.cacheFile.toString()));
+                            }
+                            
+                            for(String f : this.cacheFile.getParentFile().list()) {
+                                LOG.error(String.format("File %s is in a dir %s", f, this.cacheFile.getParentFile().toString()));
+                            }
+                            
+                            throw new IOException(String.format("cannot open data (%s) after %d sec waiting", this.cacheFile.toString(), WAIT_TIMEOUT_SEC));
+                        }
+                        
+                        if(key == null) {
+                            continue;
+                        }
                     } catch (InterruptedException ex) {
+                        LOG.error(ex);
                         throw new IOException(ex);
                     }
                     
-                    curTime = DateTimeUtils.getTimestamp();
+                    for(WatchEvent<?> event : key.pollEvents()) {
+                        WatchEvent.Kind<?> kind = event.kind();
+                    
+                        if(kind == StandardWatchEventKinds.OVERFLOW) {
+                            continue;
+                        }
+                        
+                        WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                        Path filename = ev.context();
+                        
+                        if(filename.equals(this.cacheFile)) {
+                            if(kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                                LOG.info(String.format("File is created or updated - %s, %s", filename.toString(), kind.name()));
+                                created = true;
+                            } else {
+                                LOG.info(String.format("Unknown event raised from filesystem - %s, %s", filename.toString(), kind.name()));
+                            }
+                        }
+                        
+                        if(created) {
+                            break;
+                        }
+                    }
+                    
+                    if(created) {
+                        break;
+                    }
+                    
+                    boolean valid = key.reset();
+                    if(!valid) {
+                        LOG.error("key is not valid");
+                        break;
+                    }
                 }
+                
+                fsWatcher.close();
             }
         }
         
+        if(this.lastCacheFileLength >= offset) {
+            return;
+        }
+        
+        // update and try again
         this.lastCacheFileLength = this.cacheFile.length();
         if(this.lastCacheFileLength >= offset) {
             return;
@@ -179,12 +256,28 @@ public class DirectCacheFileInputStream extends AbstractSeekableInputStream {
             return;
         }
         
+        if(offset == this.offset) {
+            return;
+        }
+        
         safeInitCacheFileInputStream();
         
         long seekable = (int) Math.min(this.size, offset);
+        // wait
         waitData(this.beginOffset + seekable);
         
-        this.cacheInputStream.getChannel().position(this.beginOffset + seekable);
+        if(this.cacheInputStream != null) {
+            this.cacheInputStream.close();
+            
+            try {
+                FileInputStream is = new FileInputStream(this.cacheFile);
+                is.getChannel().position(this.beginOffset + seekable);
+                this.cacheInputStream = new BufferedInputStream(is, BUFFER_SIZE);
+            } catch (FileNotFoundException ex) {
+                LOG.error(ex);
+                throw new IOException(ex);
+            }
+        }
         this.offset = seekable;
     }
     
