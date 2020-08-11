@@ -29,7 +29,7 @@ public class TempFileUtils {
         return new File(TEMP_PATH_ROOT);
     }
     
-    public static File createTempFile(String name) throws IOException {
+    public synchronized static File createTempFile(String name) throws IOException {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -44,7 +44,7 @@ public class TempFileUtils {
         return f;
     }
     
-    public static File createTempFile(String prefix, String extension) throws IOException {
+    public synchronized static File createTempFile(String prefix, String extension) throws IOException {
         // prefix and extension can be null
         
         File f = File.createTempFile(prefix, extension, getTempRoot());
@@ -54,7 +54,7 @@ public class TempFileUtils {
         return f;
     }
     
-    public static File createTempDir(String name) {
+    public synchronized static File createTempDir(String name) {
         if(name == null || name.isEmpty()) {
             throw new IllegalArgumentException("name is null or empty");
         }
@@ -69,19 +69,25 @@ public class TempFileUtils {
         return f;
     }
     
-    public static boolean makeTempRoot() {
+    public synchronized static boolean makeTempRoot() {
         File tempRoot = getTempRoot();
         if(tempRoot.exists()) {
             return true;
         } else {
             boolean makeDir = tempRoot.mkdirs();
-            tempRoot.setReadable(true, false);
-            tempRoot.setWritable(true, false);
-            return makeDir;
+            if(makeDir) {
+                // created
+                tempRoot.setReadable(true, false);
+                tempRoot.setWritable(true, false);
+                return true;
+            } else {
+                // not created
+                return tempRoot.exists();
+            }
         }
     }
     
-    public static void clearTempRoot() {
+    public synchronized static void clearTempRoot() {
         DirUtils.clearDir(getTempRoot());
     }
 }

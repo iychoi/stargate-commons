@@ -132,17 +132,28 @@ public class DataChunkStatus {
         this.cacheNodeName = cacheNodeName;
     }
     
-    @JsonProperty("local_cache_path")
+    @JsonIgnore
     public File getLocalCachePath() {
         return this.localCacheFilePath;
     }
-
+    
     @JsonProperty("local_cache_path")
+    public String getLocalCachePathString() {
+        return this.localCacheFilePath.getAbsolutePath();
+    }
+
+    @JsonIgnore
     public void setLocalCachePath(File localCachePath) {
         this.localCacheFilePath = localCachePath;
     }
     
+    @JsonProperty("local_cache_path")
+    public void setLocalCachePathString(String localCachePath) {
+        this.localCacheFilePath = new File(localCachePath);
+    }
+    
     @Override
+    @JsonIgnore
     public String toString() {
         return String.format("%s", this.source.toString());
     }

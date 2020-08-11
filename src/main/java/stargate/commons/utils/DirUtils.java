@@ -22,7 +22,7 @@ import java.io.File;
  * @author iychoi
  */
 public class DirUtils {
-    public static boolean makeDir(File file) {
+    public synchronized static boolean makeDir(File file) {
         if(file == null) {
             throw new IllegalArgumentException("file is null");
         }
@@ -34,7 +34,7 @@ public class DirUtils {
         }
     }
     
-    public static void clearDir(File file) {
+    public synchronized static void clearDir(File file) {
         if(file == null) {
             throw new IllegalArgumentException("file is null");
         }
@@ -47,7 +47,7 @@ public class DirUtils {
         }
     }
     
-    private static void removeRecursively(File file) {
+    private synchronized static void removeRecursively(File file) {
         if(file.isFile()) {
             file.delete();
         } else if(file.isDirectory()) {

@@ -239,8 +239,26 @@ public class RecipeChunk {
             throw new IllegalArgumentException("nodeID is negative");
         }
         
-        if(!this.nodeIDs.contains(new Integer(nodeID))) {
+        if(nodeID == NODE_ID_ALL_NODES) {
+            this.nodeIDs.clear();
             this.nodeIDs.add(nodeID);
+        } else {
+            if(!this.nodeIDs.contains(new Integer(nodeID))) {
+                this.nodeIDs.add(nodeID);
+            }
+        }
+    }
+    
+    @JsonIgnore
+    public synchronized boolean containsNodeID(int nodeID) {
+        if(nodeID < 0 && nodeID != NODE_ID_ALL_NODES) {
+            throw new IllegalArgumentException("nodeID is negative");
+        }
+        
+        if(this.nodeIDs.contains(new Integer(NODE_ID_ALL_NODES))) {
+            return true;
+        } else {
+            return this.nodeIDs.contains(new Integer(nodeID));
         }
     }
     
