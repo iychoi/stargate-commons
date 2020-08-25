@@ -57,7 +57,8 @@ public class ChunkDataPartInputStream extends AbstractSeekableInputStream {
         if(is instanceof AbstractSeekableInputStream) {
             this.inputStream = (AbstractSeekableInputStream) is;
         } else {
-            this.inputStream = new DiskBufferInputStream(is, chunkSize);
+            this.inputStream = new RAMBufferInputStream(is, chunkSize);
+            //this.inputStream = new DiskBufferInputStream(is, chunkSize);
         }
         
         this.chunkStartOffset = chunkStartOffset;

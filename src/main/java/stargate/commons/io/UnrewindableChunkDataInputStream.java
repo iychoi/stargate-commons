@@ -22,13 +22,14 @@ import java.io.InputStream;
  *
  * @author iychoi
  */
-public class ChunkDataInputStream extends AbstractSeekableInputStream {
+public class UnrewindableChunkDataInputStream extends AbstractSeekableInputStream {
 
-    private AbstractSeekableInputStream inputStream;
+    private InputStream inputStream;
     private long chunkStartOffset;
     private int chunkSize;
+    private long offset;
     
-    public ChunkDataInputStream(InputStream is, long chunkStartOffset, int chunkSize) throws IOException {
+    public UnrewindableChunkDataInputStream(InputStream is, long chunkStartOffset, int chunkSize) throws IOException {
         if(is == null) {
             throw new IllegalArgumentException("is is null");
         }
@@ -41,15 +42,11 @@ public class ChunkDataInputStream extends AbstractSeekableInputStream {
             throw new IllegalArgumentException("chunkSize is negative");
         }
         
-        if(is instanceof AbstractSeekableInputStream) {
-            this.inputStream = (AbstractSeekableInputStream) is;
-        } else {
-            this.inputStream = new RAMBufferInputStream(is, chunkSize);
-            //this.inputStream = new DiskBufferInputStream(is, chunkSize);
-        }
+        this.inputStream = is;
         
         this.chunkStartOffset = chunkStartOffset;
         this.chunkSize = chunkSize;
+        this.offset = 0;
     }
 
     public long getChunkStartOffset() {
@@ -70,32 +67,56 @@ public class ChunkDataInputStream extends AbstractSeekableInputStream {
     
     @Override
     public synchronized int read() throws IOException {
-        return this.inputStream.read();
+        int r = this.inputStream.read();
+        if(r >= 0) {
+            this.offset++;
+        }
+        return r;
     }
     
     @Override
     public synchronized int read(byte[] bytes, int off, int len) throws IOException {
-        return this.inputStream.read(bytes, off, len);
+        int read = this.inputStream.read(bytes, off, len);
+        if(read >= 0) {
+            this.offset += read;
+        }
+        return read;
     }
     
     @Override
     public synchronized int read(byte bytes[]) throws IOException {
-        return this.inputStream.read(bytes);
+        int read = this.inputStream.read(bytes);
+        if(read >= 0) {
+            this.offset += read;
+        }
+        return read;
     }
     
     @Override
     public synchronized long skip(long skip) throws IOException {
-        return this.inputStream.skip(skip);
+        long read = this.inputStream.skip(skip);
+        if(read >= 0) {
+            this.offset += read;
+        }
+        return read;
     }
     
     @Override
     public long getOffset() throws IOException {
-        return this.inputStream.getOffset();
+        return this.offset;
     }
     
     @Override
     public synchronized void seek(long offset) throws IOException {
-        this.inputStream.seek(offset);
+        if(this.offset <= offset) {
+            long read = this.inputStream.skip(offset - this.offset);
+            if(read >= 0) {
+                this.offset += read;
+            }
+            return;
+        } else {
+            throw new UnsupportedOperationException("Seek backword is not supported");
+        }
     }
     
     @Override

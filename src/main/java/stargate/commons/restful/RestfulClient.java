@@ -349,7 +349,7 @@ public class RestfulClient {
         URI requestURL = makeRequestURL(path);
         LOG.debug("sending a download request - " + requestURL.toString());
         AsyncWebResource webResource = this.httpClient.asyncResource(requestURL);
-        return (Future<ClientResponse>) webResource.accept("application/octet-stream", "application/json").type("application/json").get(ClientResponse.class);
+        return (Future<ClientResponse>) webResource.accept("application/octet-stream").type("application/json").get(ClientResponse.class);
     }
     
     public InputStream processDownloadAsync(Future<ClientResponse> future) throws IOException, FileNotFoundException, AuthenticationException {

@@ -17,18 +17,24 @@ package stargate.commons.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import stargate.commons.datastore.BigKeyValueStoreUtils;
 
 /**
  *
  * @author iychoi
  */
-public class ChunkDataInputStream extends AbstractSeekableInputStream {
+public class UnrewindableChunkDataPartInputStream extends AbstractSeekableInputStream {
 
-    private AbstractSeekableInputStream inputStream;
+    private InputStream inputStream;
     private long chunkStartOffset;
     private int chunkSize;
+    private int partSize;
+    private int partNo;
+    private long partStartOffsetInChunk;
+    private int actualPartSize;
+    private long offset;
     
-    public ChunkDataInputStream(InputStream is, long chunkStartOffset, int chunkSize) throws IOException {
+    public UnrewindableChunkDataPartInputStream(InputStream is, long chunkStartOffset, int chunkSize, int chunkPartNo, int chunkPartSize) throws IOException {
         if(is == null) {
             throw new IllegalArgumentException("is is null");
         }
@@ -41,28 +47,53 @@ public class ChunkDataInputStream extends AbstractSeekableInputStream {
             throw new IllegalArgumentException("chunkSize is negative");
         }
         
-        if(is instanceof AbstractSeekableInputStream) {
-            this.inputStream = (AbstractSeekableInputStream) is;
-        } else {
-            this.inputStream = new RAMBufferInputStream(is, chunkSize);
-            //this.inputStream = new DiskBufferInputStream(is, chunkSize);
+        if(chunkPartNo < 0) {
+            throw new IllegalArgumentException("chunkPartNo is negative");
         }
+        
+        if(chunkPartSize < 0) {
+            throw new IllegalArgumentException("chunkPartSize is negative");
+        }
+        
+        this.inputStream = is;
         
         this.chunkStartOffset = chunkStartOffset;
         this.chunkSize = chunkSize;
+        this.partNo = chunkPartNo;
+        this.partSize = chunkPartSize;
+        this.offset = 0;
+        
+        this.partStartOffsetInChunk = BigKeyValueStoreUtils.getPartStartOffset(this.partSize, this.partNo);
+        this.actualPartSize = BigKeyValueStoreUtils.getPartSize(this.chunkSize, this.partSize, this.partNo);
     }
-
+    
     public long getChunkStartOffset() {
         return this.chunkStartOffset;
+    }
+    
+    public long getPartStartOffsetInChunk() {
+        return this.partStartOffsetInChunk;
     }
 
     public int getChunkSize() {
         return this.chunkSize;
     }
+    
+    public int getChunkPartNo() {
+        return this.partNo;
+    }
+    
+    public int getChunkPartSize() {
+        return this.partSize;
+    }
+    
+    public int getActualChunkPartSize() {
+        return this.actualPartSize;
+    }
 
     public boolean containsOffset(long offset) {
-        if (this.chunkStartOffset <= offset &&
-            (this.chunkStartOffset + this.chunkSize) > offset) {
+        if (this.chunkStartOffset + this.partStartOffsetInChunk <= offset &&
+            (this.chunkStartOffset + this.partStartOffsetInChunk + this.partSize) > offset) {
             return true;
         }
         return false;
@@ -70,32 +101,56 @@ public class ChunkDataInputStream extends AbstractSeekableInputStream {
     
     @Override
     public synchronized int read() throws IOException {
-        return this.inputStream.read();
+        int r = this.inputStream.read();
+        if(r >= 0) {
+            this.offset++;
+        }
+        return r;
     }
-    
+        
     @Override
     public synchronized int read(byte[] bytes, int off, int len) throws IOException {
-        return this.inputStream.read(bytes, off, len);
+        int read = this.inputStream.read(bytes, off, len);
+        if(read >= 0) {
+            this.offset += read;
+        }
+        return read;
     }
-    
+        
     @Override
     public synchronized int read(byte bytes[]) throws IOException {
-        return this.inputStream.read(bytes);
+        int read = this.inputStream.read(bytes);
+        if(read >= 0) {
+            this.offset += read;
+        }
+        return read;
     }
-    
+        
     @Override
     public synchronized long skip(long skip) throws IOException {
-        return this.inputStream.skip(skip);
+        long read = this.inputStream.skip(skip);
+        if(read >= 0) {
+            this.offset += read;
+        }
+        return read;
     }
-    
+
     @Override
     public long getOffset() throws IOException {
-        return this.inputStream.getOffset();
+        return this.offset;
     }
-    
+
     @Override
     public synchronized void seek(long offset) throws IOException {
-        this.inputStream.seek(offset);
+        if(this.offset <= offset) {
+            long read = this.inputStream.skip(offset - this.offset);
+            if(read >= 0) {
+                this.offset += read;
+            }
+            return;
+        } else {
+            throw new UnsupportedOperationException("Seek backword is not supported");
+        }
     }
     
     @Override
